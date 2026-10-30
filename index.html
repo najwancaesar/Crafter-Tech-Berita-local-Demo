@@ -20,7 +20,7 @@
     ═══════════════════════════════════════════════════ -->
     <header class="site-header">
 
-      <!-- NAV PRIMARY — red bar, main category links -->
+      <!-- NAV PRIMARY — top bar: home button + primary categories -->
       <div class="nav-primary-wrap">
         <button class="mobile-menu" id="mobileMenu" aria-expanded="false" aria-controls="siteNav">
           ☰ <span>栏目</span>
@@ -28,19 +28,23 @@
         <nav id="siteNav" class="site-nav nav-primary" aria-label="主要导航"></nav>
       </div>
 
-      <!-- NAV SECONDARY — light bar, language selector + search -->
+      <!-- NAV SECONDARY — bottom bar: secondary categories + language selector + search -->
       <div class="nav-secondary-wrap">
         <nav class="site-nav nav-secondary-sub" aria-label="次要导航" id="siteNavSub"></nav>
         <div class="nav-tools">
           <!-- Language selector (display only, no translation function) -->
           <div class="lang-box" aria-label="语言选择（展示用）" tabindex="0">
-            <span>SELECT LANGUAGE</span>
-            <span class="lang-arrow">▼</span>
+            <span class="lang-text">SELECT LANGUAGE</span>
+            <span class="lang-divider" aria-hidden="true">|</span>
+            <span class="lang-arrow" aria-hidden="true">▼</span>
           </div>
-          <!-- Search toggle -->
+          <!-- Search toggle & button -->
           <button type="button" class="search-btn" id="searchToggle"
             aria-expanded="false" aria-controls="searchPanel" aria-label="打开搜索">
-            <span class="search-icon">⌕</span>
+            <svg class="search-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.5" y2="16.5"></line>
+            </svg>
           </button>
         </div>
         <form class="search-panel" id="searchPanel" role="search" hidden>
@@ -54,7 +58,10 @@
       <!-- MASTHEAD — logo, slogan, app badges, weather -->
       <div class="masthead">
         <a class="brand" href="#home" aria-label="Shangbao Indonesia 首页">
-          <span class="brand-mark">商报</span>
+          <div class="brand-logo-group">
+            <span class="brand-sub">印度尼西亚</span>
+            <span class="brand-mark">商报</span>
+          </div>
           <span class="brand-copy">加强全民团结促经济繁荣</span>
         </a>
         <div class="app-badges" aria-label="移动应用入口">
@@ -70,9 +77,10 @@
         <div class="weather" aria-label="天气示意信息">
           <span class="weather-time" id="weatherTime">09:24:28</span>
           <div class="weather-body">
-            <span class="weather-temp">30<span>°C</span></span>
+            <span class="weather-temp">30</span>
+            <span class="weather-unit">°C</span>
           </div>
-          <span class="weather-city">雅加达</span>
+          <span class="weather-city">雅 加 达</span>
           <small class="weather-note">本地演示数据</small>
         </div>
       </div>
@@ -83,7 +91,7 @@
          TICKER — scrolling breaking news bar
     ═══════════════════════════════════════════════════ -->
     <div class="ticker" aria-label="热点新闻">
-      <div class="ticker-label">热點新聞</div>
+      <div class="ticker-label">熱點新聞</div>
       <div class="ticker-viewport">
         <div class="ticker-track" id="tickerTrack"></div>
       </div>
@@ -91,7 +99,7 @@
     <!-- /TICKER -->
 
     <!-- ═══════════════════════════════════════════════════
-         MAIN — ad banner + top grid + category feed
+         MAIN — top grid + category feed
     ═══════════════════════════════════════════════════ -->
     <main id="main">
 
@@ -124,11 +132,15 @@
             <ol class="popular-list" id="popularList"></ol>
           </section>
           <section class="widget side-promo">
-            <h2 class="widget-title"><span class="widget-tab active">今日要闻</span></h2>
+            <div class="widget-title">
+              <span class="widget-tab active">今日要闻</span>
+            </div>
             <div id="sideHighlights"></div>
           </section>
           <section class="widget side-note">
-            <h2 class="widget-title"><span class="widget-tab active">关于本演示</span></h2>
+            <div class="widget-title">
+              <span class="widget-tab active">关于本演示</span>
+            </div>
             <p>此页面用于学习网页结构重建。快照未附带原站图片资源文件夹，因此图片区域使用可替换占位图。</p>
           </section>
         </aside>

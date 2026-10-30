@@ -1,2 +1,6 @@
 assets/img/
 reference/
+node_modules/
+package-lock.json
+screenshots/
+
