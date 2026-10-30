@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+  <!-- Outer border matching reference -->
+  <rect x="2" y="2" width="316" height="176" fill="#ffffff" stroke="#5bb7f5" stroke-width="4" rx="2"/>
+  
+  <!-- Left Side: Market Chart Illustration -->
+  <g id="chart-illustration" transform="translate(18, 16)">
+    <!-- Chart Grid Board (tilted slightly) -->
+    <g transform="rotate(-6 70 70)">
+      <!-- Board shadow -->
+      <rect x="6" y="8" width="130" height="115" rx="10" fill="#000000" opacity="0.18" filter="blur(2px)"/>
+      <!-- Board main fill -->
+      <rect x="0" y="0" width="130" height="115" rx="10" fill="#f8b62d"/>
+      <rect x="4" y="4" width="122" height="107" rx="8" fill="#ffc233"/>
+      <!-- Grid lines -->
+      <path d="M 4 25 L 126 25 M 4 45 L 126 45 M 4 65 L 126 65 M 4 85 L 126 85 M 4 105 L 126 105" stroke="#e09010" stroke-width="1.5" opacity="0.7"/>
+      <path d="M 25 4 L 25 111 M 48 4 L 48 111 M 72 4 L 72 111 M 96 4 L 96 111 M 118 4 L 118 111" stroke="#e09010" stroke-width="1.5" opacity="0.7"/>
+      <!-- Trend Arrow Line -->
+      <polyline points="12,100 35,78 62,86 98,34" fill="none" stroke="#d81b17" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <polygon points="90,26 112,30 102,48" fill="#d81b17"/>
+    </g>
+    <!-- Big 3D Red Dollar Sign -->
+    <g transform="translate(10, 0)">
+      <!-- Shadow -->
+      <text x="18" y="58" font-family="'Arial Black', Impact, sans-serif" font-size="56" font-weight="900" fill="#880e0c" opacity="0.5">$</text>
+      <!-- Dollar body -->
+      <text x="14" y="54" font-family="'Arial Black', Impact, sans-serif" font-size="56" font-weight="900" fill="#e51c18">$</text>
+    </g>
+  </g>
+
+  <!-- Right Side: Calligraphy Characters 行情 -->
+  <g id="calligraphy-hangqing" transform="translate(160, 20)">
+    <!-- 行 -->
+    <text x="65" y="65" font-family="'Kaiti', 'STKaiti', 'SimSun', serif" font-size="64" font-weight="bold" fill="#000000" text-anchor="middle">行</text>
+    <!-- 情 -->
+    <text x="82" y="130" font-family="'Kaiti', 'STKaiti', 'SimSun', serif" font-size="64" font-weight="bold" fill="#000000" text-anchor="middle">情</text>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1096 136" width="1096" height="136">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fff8f5"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fff8f5"/>
+    </linearGradient>
+    <linearGradient id="btnGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#cd1713"/>
+      <stop offset="100%" stop-color="#9a0e0b"/>
+    </linearGradient>
+  </defs>
+  <rect x="0.5" y="0.5" width="1095" height="135" rx="4" fill="url(#bgGrad)" stroke="#e4e4e4" stroke-width="1"/>
+  <!-- Decorative badge -->
+  <rect x="24" y="24" width="88" height="88" rx="8" fill="#cd1713" opacity="0.08"/>
+  <text x="68" y="77" font-family="'SimSun', serif" font-size="36" font-weight="900" fill="#cd1713" text-anchor="middle">商报</text>
+  <!-- Content title and subtext -->
+  <text x="136" y="58" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="22" font-weight="bold" fill="#222">印尼商报数字版及全媒体推广服务</text>
+  <text x="136" y="90" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="14" fill="#666">加强全民团结促经济繁荣 · 权威商业资讯与多元传播平台</text>
+  <!-- CTA Button -->
+  <g transform="translate(900, 46)">
+    <rect width="160" height="44" rx="22" fill="url(#btnGrad)"/>
+    <text x="80" y="27" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">了解详情 »</text>
+  </g>
+</svg>

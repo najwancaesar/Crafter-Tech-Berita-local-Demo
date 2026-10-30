@@ -23,7 +23,7 @@
       for (let i = 0; i < a.id.length; i++) hash = ((hash << 5) - hash + a.id.charCodeAt(i)) | 0;
       return POOL[Math.abs(hash) % POOL.length];
     }
-    return `assets/img/${encodeURIComponent(a.id)}.jpg`;
+    return `assets/images/articles/${encodeURIComponent(a.id)}.jpg`;
   }
 
   function scene(a, className='') {
@@ -114,15 +114,23 @@
     $$('#carouselDots button').forEach((dot, i) => dot.classList.toggle('active', i === slideIndex));
   }
 
-  function renderPopular() {
-    const stories = data.popular.map(id => byId.get(id)).filter(Boolean).slice(0, 10);
-    $('#popularList').innerHTML = stories.map((a, i) =>
-      `<li><span class="popular-num">${String(i+1).padStart(2, '0')}</span>${articleLink(a)}</li>`
+  function renderPopular(isMostRead = false) {
+    const listEl = $('#popularList');
+    if (!listEl) return;
+    const offset = isMostRead ? 5 : 0;
+    const stories = data.popular.slice(offset, offset + 5).map(id => byId.get(id)).filter(Boolean);
+    const list = stories.length ? stories : data.articles.slice(offset, offset + 5);
+    listEl.innerHTML = list.map((a, i) =>
+      `<li><span class="popular-num">${String(i + 1).padStart(2, '0')}</span>${articleLink(a)}</li>`
     ).join('') || '<li>暂无推荐新闻</li>';
+
     const quick = data.articles.slice(0, 2);
-    $('#sideHighlights').innerHTML = quick.map(a =>
-      `<article class="side-highlight">${scene(a)}<div><h3>${articleLink(a)}</h3><p>${esc(sourceDate(a))}</p></div></article>`
-    ).join('');
+    const sideHighlights = $('#sideHighlights');
+    if (sideHighlights) {
+      sideHighlights.innerHTML = quick.map(a =>
+        `<article class="side-highlight">${scene(a)}<div><h3>${articleLink(a)}</h3><p>${esc(sourceDate(a))}</p></div></article>`
+      ).join('');
+    }
   }
 
   function cardList(ids) { return ids.map(id => byId.get(id)).filter(Boolean); }
@@ -226,6 +234,21 @@
     renderSearch($('#searchInput').value);
   });
   $('#searchInput').addEventListener('keydown', e => { if (e.key === 'Escape') $('#searchClose').click(); });
+
+  const tabPop = $('#tabPopular');
+  const tabMost = $('#tabMostRead');
+  if (tabPop && tabMost) {
+    tabPop.addEventListener('click', () => {
+      tabPop.classList.add('active');
+      tabMost.classList.remove('active');
+      renderPopular(false);
+    });
+    tabMost.addEventListener('click', () => {
+      tabMost.classList.add('active');
+      tabPop.classList.remove('active');
+      renderPopular(true);
+    });
+  }
 
   $('#mobileMenu').addEventListener('click', () => {
     const isOpen = $('#siteNav').classList.toggle('open');

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 90" width="760" height="90">
+  <!-- Sub title: 印度尼西亚 in blue calligraphy style -->
+  <text x="2" y="24" font-family="'Kaiti', 'STKaiti', 'KaiTi_GB2312', serif" font-size="18" font-style="italic" fill="#2262cc" letter-spacing="3">印度尼西亚</text>
+  <!-- Main brand mark: 商报 in red -->
+  <text x="2" y="80" font-family="'SimSun', 'STSong', 'Songti SC', serif" font-size="64" font-weight="900" fill="#cd1713" letter-spacing="4">商报</text>
+  <!-- Main slogan: 加强全民团结促经济繁荣 in black -->
+  <text x="180" y="68" font-family="'SimSun', 'STSong', 'Songti SC', serif" font-size="34" font-weight="700" fill="#171717" letter-spacing="3">加强全民团结促经济繁荣</text>
+</svg>

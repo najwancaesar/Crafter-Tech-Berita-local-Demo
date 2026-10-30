@@ -65,13 +65,11 @@
           <span class="brand-copy">加强全民团结促经济繁荣</span>
         </a>
         <div class="app-badges" aria-label="移动应用入口">
-          <a href="#apps" class="store-badge">
-            <span class="store-icon">▶</span>
-            <span><small>GET IT ON</small><strong>Google Play</strong></span>
+          <a href="#apps" class="store-badge-link" aria-label="Google Play">
+            <img src="assets/images/brand/google-play-badge.svg" alt="Google Play" width="156" height="50" class="store-badge-img">
           </a>
-          <a href="#apps" class="store-badge apple">
-            <span class="store-icon">●</span>
-            <span><small>Download on the</small><strong>App Store</strong></span>
+          <a href="#apps" class="store-badge-link" aria-label="App Store">
+            <img src="assets/images/brand/app-store-badge.svg" alt="App Store" width="156" height="50" class="store-badge-img">
           </a>
         </div>
         <div class="weather" aria-label="天气示意信息">
@@ -103,9 +101,11 @@
     ═══════════════════════════════════════════════════ -->
     <main id="main">
 
-      <!-- AD PLACEHOLDER -->
+      <!-- AD BANNER -->
       <div class="ad-placeholder" aria-label="广告位置">
-        <span>广告横幅位置 · 可替换为授权素材</span>
+        <a href="#ad-details" class="ad-banner-link" aria-label="印尼商报推广服务">
+          <img src="assets/images/banners/head-ad-banner.svg" alt="印尼商报全媒体推广服务" class="ad-banner-img">
+        </a>
       </div>
 
       <!-- TOP GRID — hero carousel + sidebar -->
@@ -124,19 +124,31 @@
 
         <!-- SIDEBAR -->
         <aside class="sidebar" aria-label="推荐新闻">
+          <!-- Widget: Popular News -->
           <section class="widget">
             <div class="widget-title">
-              <span class="widget-tab active">热文推荐</span>
-              <span class="widget-tab-sub">最多阅读者</span>
+              <button type="button" class="widget-tab active" id="tabPopular">热文推荐</button>
+              <button type="button" class="widget-tab-sub" id="tabMostRead">最多阅读者</button>
             </div>
             <ol class="popular-list" id="popularList"></ol>
           </section>
+
+          <!-- Widget: Market Rates / Trends Banner matching reference screenshot -->
+          <div class="widget-market-promo" aria-label="市场行情">
+            <a href="#category/财经">
+              <img src="assets/images/sidebar/market-trends.svg" alt="市场行情" class="sidebar-market-img">
+            </a>
+          </div>
+
+          <!-- Widget: Side Highlights -->
           <section class="widget side-promo">
             <div class="widget-title">
               <span class="widget-tab active">今日要闻</span>
             </div>
             <div id="sideHighlights"></div>
           </section>
+
+          <!-- Widget: About Demo -->
           <section class="widget side-note">
             <div class="widget-title">
               <span class="widget-tab active">关于本演示</span>

@@ -1,93 +1,95 @@
-# Shangbao Indonesia — Homepage Reconstruction
+# Shangbao Indonesia — Frontend Reconstruction
 
-This is a **runnable static front-end reconstruction prototype** made from the user-supplied saved homepage HTML. It is not the original source code and it does not include the original server-side application or database.
+This is a **pure frontend reconstruction prototype** of the Shangbao Indonesia homepage, developed with **HTML5, CSS3, and Vanilla JavaScript**. It uses local assets with no external build tools, no Node.js runtime dependencies, and no framework overhead.
 
-> See [`DESIGN_TOKENS.md`](./DESIGN_TOKENS.md) for all measured design values and [`GAP_REPORT.md`](./GAP_REPORT.md) for before/after comparison.
+The frontend is specifically prepared to be portable into **CrafterCMS** as a FreeMarker templated project.
 
-## Run it
+> See [`DESIGN_TOKENS.md`](./DESIGN_TOKENS.md) for all measured design values and [`GAP_REPORT.md`](./GAP_REPORT.md) for the detailed visual comparison against original screenshots.
 
-- Easiest: serve this folder with Laragon (already configured at `http://shangbao-reconstruction.test/`) or any local HTTP server.
-- Or: double-click `index.html` (works without a server — all data is bundled in `assets/js/data.js`).
-- Windows: double-click `serve.bat`  
-- macOS/Linux/WSL: `python3 -m http.server 8000` → `http://localhost:8000`
+---
 
-## What's implemented
+## Quick Start (How to Run)
 
-| Feature | Status |
-|---|---|
-| Chinese category navigation (primary red bar + secondary light bar) | ✅ |
-| Breaking-news ticker with chevron label | ✅ |
-| Featured-news carousel (prev/next, dots, auto-rotate) | ✅ |
-| News category sections with lead story + grid | ✅ |
-| Popular-news sidebar (two-tab style) | ✅ |
-| Full-text search across article titles and snippets | ✅ |
-| Local article preview (`#article/...`) with link to source | ✅ |
-| Dark outer background with centered white container | ✅ |
-| Two-row navigation (red primary + light secondary) | ✅ |
-| SELECT LANGUAGE box (yellow, display only) | ✅ |
-| Search button (blue) in nav | ✅ |
-| Live clock in weather block | ✅ |
-| Responsive mobile layout (390px–1920px) | ✅ |
-| Image pool fallback mechanism | ✅ |
-| Back-to-top button | ✅ |
+Because this project uses pure static web standards with all prototype data bundled in `assets/js/data.js`, no backend, database, or build step is required:
 
-## Adding your images
+1. **Option 1 (Direct in Browser):**
+   - Double-click `index.html` to open it directly in any modern browser.
 
-**Priority order (no build step required):**
+2. **Option 2 (Local Web Server):**
+   - **Laragon / Apache:** Already hosted if placed in `c:\laragon\www\shangbao-reconstruction\` (open `http://localhost/shangbao-reconstruction/` or `http://shangbao-reconstruction.test/`).
+   - **Windows batch launcher:** Double-click `serve.bat`.
+   - **Any static server:** `python -m http.server 8000` or PHP built-in server `php -S localhost:8000`.
 
-1. **By article ID** — place file as `assets/img/<article-id>.jpg` (or `.png`, `.webp`)
-2. **Manual map** — edit `assets/js/images.js` and add `'article-id': 'assets/img/filename.jpg'`
-3. **Pool** — put any image in `assets/img/pool/` and declare the filenames in `window.SHANGBAO_IMAGE_POOL` in `images.js`
-4. **Automatic map** (from a saved-page folder):
-   ```
-   python tools/map_images.py "/path/to/首页 - Shangbao Indonesia_files"
-   ```
+---
 
-Image aspect ratios preserved: carousel 1.76 · lead story 1.38 · small thumbnail 1.35 · sidebar highlight 1.25.
+## Technology Stack
 
-## Project structure
+- **Markup:** Semantic HTML5 with accessibility attributes (`aria-*`, skip-links, role attributes)
+- **Styling:** Modern responsive CSS3 with CSS Custom Properties (Design Tokens), flexbox, grid, and fluid typography (`clamp()`)
+- **Scripting:** Pure Vanilla JavaScript (ES6+), zero external runtime dependencies, native DOM manipulation
+- **Media:** Clean local image assets and crisp vector SVGs (brand badges, icons, banners, charts)
+
+---
+
+## Project Structure
 
 ```text
 shangbao-reconstruction/
-├── index.html                  ← main page
-├── DESIGN_TOKENS.md            ← all measured design values
-├── GAP_REPORT.md               ← visual gap analysis
-├── README.md
-├── SOURCE_ANALYSIS.md
-├── take_screenshots.py        ← Playwright verification screenshot script
+├── index.html                  ← Main frontend markup (with CrafterCMS block boundaries)
+├── DESIGN_TOKENS.md            ← All measured colors, typography, dimensions, and spacing
+├── GAP_REPORT.md               ← Visual comparison report vs original screenshot
+├── README.md                   ← Project documentation and execution instructions
+├── SOURCE_ANALYSIS.md          ← Analysis of the original snapshot
+├── NOTICE.txt                  ← Legal notices and usage constraints
 ├── assets/
-│   ├── css/styles.css          ← all styles (authored from scratch)
-│   └── js/
-│       ├── data.js             ← article data (do not edit)
-│       ├── images.js           ← image map + pool fallback
-│       └── app.js              ← rendering & routing logic
-├── reference-shots/            ← reference screenshots for comparison
-├── tools/map_images.py         ← image mapping helper
-└── reference/                  ← original snapshot HTML (gitignored)
+│   ├── css/
+│   │   └── styles.css          ← Author-crafted CSS rules based on measured tokens
+│   ├── js/
+│   │   ├── data.js             ← Extracted article records and navigation data
+│   │   ├── images.js           ← Image mapping, pool manager, and fallback logic
+│   │   └── app.js              ← Vanilla JS rendering, routing, clock, and UI interactions
+│   └── images/
+│       ├── brand/              ← Logos, Google Play badge, App Store badge (SVG)
+│       ├── backgrounds/        ← Outer vignette and background textures
+│       ├── banners/            ← Header advertising banner (SVG / responsive)
+│       ├── articles/           ← Local article photographs (JPG / PNG / WebP)
+│       ├── sidebar/            ← Sidebar market chart graphic (SVG)
+│       └── placeholders/       ← High-resolution fallback placeholders (SVG)
+├── reference-shots/            ← Original reference screenshots for visual validation
+└── reference/                  ← Original snapshot HTML (gitignored)
 ```
 
-## CSS class naming guide (stable for CrafterCMS FreeMarker templates)
+---
 
-| Block | Key classes |
-|---|---|
-| Shell | `.site-shell` |
-| Header | `.site-header` |
-| Nav primary (red) | `.nav-primary-wrap`, `.site-nav.nav-primary`, `.nav-link` |
-| Nav secondary (light) | `.nav-secondary-wrap`, `.site-nav.nav-secondary-sub`, `.nav-link-sub` |
-| Language box | `.lang-box` |
-| Search | `.search-btn`, `.search-panel` |
-| Masthead | `.masthead`, `.brand`, `.brand-mark`, `.brand-copy`, `.app-badges`, `.store-badge`, `.weather` |
-| Ticker | `.ticker`, `.ticker-label`, `.ticker-viewport`, `.ticker-track` |
-| Top grid | `.top-grid`, `.hero-area`, `.hero-carousel`, `.hero-slide`, `.hero-caption` |
-| Sidebar | `.sidebar`, `.widget`, `.widget-title`, `.widget-tab`, `.popular-list`, `.popular-num`, `.side-highlight` |
-| Category feed | `.category-feed`, `.category-column`, `.category-section`, `.category-heading`, `.lead-story`, `.story-grid`, `.small-story` |
-| News image | `.news-scene`, `.news-photo`, `.hero-photo` |
-| Footer | `.site-footer`, `.footer-top`, `.footer-brand`, `.footer-links`, `.footer-social`, `.footer-bottom` |
+## Image Asset Management & Fallback
 
-## Source limitations
+Images are managed with a multi-tier fallback mechanism in `assets/js/images.js` without requiring build steps:
 
-The snapshot references a sibling folder `首页 - Shangbao Indonesia_files` for Bootstrap, jQuery, logos, banners, and news photos. That folder was not included. This prototype uses original CSS (not copied from the source) and placeholder imagery. Full article bodies, backend, database, APIs, and admin panel are not part of this reconstruction.
+1. **Specific article file:** `assets/images/articles/<id-artikel>.(jpg|png|webp)` (or legacy `assets/img/`)
+2. **Manual mapping:** Explicitly mapped in `window.SHANGBAO_IMAGES` in `images.js`
+3. **Pool distribution:** Round-robin allocation from `window.SHANGBAO_IMAGE_POOL` across articles
+4. **Clean SVG placeholder:** `assets/images/placeholders/news-placeholder.svg`
+5. **CSS abstract scene:** Pure CSS visual placeholder if image loading fails
 
-## Legal
+Slot aspect ratios are strictly preserved with `object-fit: cover`:
+- Carousel hero: `1.87` (or `1.76`)
+- Lead story: `1.38`
+- Thumbnail grid: `1.35`
+- Sidebar highlight: `1.25`
 
-See `NOTICE.txt`. Do not deploy publicly using Shangbao's brand or assets without authorization.
+---
+
+## CrafterCMS Integration Readiness
+
+The source is structured with clear separation of concerns to enable seamless porting into CrafterCMS:
+
+- **Presentation (`index.html` & `styles.css`):**
+  - Section blocks are explicitly demarcated with header comments (`HEADER`, `NAV PRIMARY`, `NAV SECONDARY`, `MASTHEAD`, `TICKER`, `HERO CAROUSEL`, `SIDEBAR`, `CATEGORY FEED`, `FOOTER`).
+  - Class names are semantic and stable (`.site-shell`, `.nav-primary`, `.hero-carousel`, `.widget-title`, `.lead-story`, `.category-section`).
+  - Can be mapped 1-to-1 to CrafterCMS FreeMarker component templates (`.ftl`).
+- **Client Interactions (`app.js`):**
+  - UI behaviors (navigation toggling, carousel cycling, search filtering, sidebar tabs, live clock) operate on clean DOM selectors independently of the data source.
+- **Content Data (`data.js`):**
+  - Prototype data structure (`navigation`, `ticker`, `features`, `categories`, `popular`, `articles`) mimics typical CMS content model schemas.
+- **Media Assets (`assets/images/`):**
+  - Organized by domain (`brand/`, `banners/`, `articles/`, `sidebar/`, `placeholders/`), ready to be relocated into CrafterCMS asset management paths (e.g., `/static-assets/images/...`).

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 50" width="160" height="50">
+  <rect x="0.5" y="0.5" width="159" height="49" rx="7" fill="#080808" stroke="#555" stroke-width="1"/>
+  <!-- Google Play Color Triangle Icon -->
+  <g transform="translate(14, 10)">
+    <path d="M1.5 1.5 L17.5 15 L1.5 28.5 Z" fill="#4bd4bc"/>
+    <path d="M1.5 1.5 L17.5 15 L11.5 20 L1.5 28.5 Z" fill="#32b5e5" opacity="0.3"/>
+    <polygon points="1.5,1.5 17.5,15 11.5,8" fill="#ffd200" opacity="0.8"/>
+    <polygon points="17.5,15 1.5,28.5 11.5,22" fill="#ff3a44" opacity="0.8"/>
+  </g>
+  <!-- Text -->
+  <text x="44" y="19" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="8.5" fill="#ccc" letter-spacing="0.8">GET IT ON</text>
+  <text x="44" y="37" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff" letter-spacing="0.2">Google Play</text>
+</svg>

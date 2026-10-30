@@ -342,6 +342,24 @@ img { display: block; max-width: 100%; }
   flex-shrink: 0;
 }
 
+.store-badge-link {
+  display: inline-block;
+  line-height: 0;
+  border-radius: 7px;
+  overflow: hidden;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.store-badge-link:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+.store-badge-img {
+  display: block;
+  width: 156px;
+  height: 50px;
+  object-fit: contain;
+}
+
 .store-badge {
   height: 52px;
   min-width: 156px;
@@ -481,19 +499,34 @@ img { display: block; max-width: 100%; }
 main { padding: 18px 18px 30px; }
 
 /* ----------------------------------------------------------------
-   AD PLACEHOLDER
+   AD BANNER & PLACEHOLDER
    ---------------------------------------------------------------- */
 .ad-placeholder {
-  height: 64px;
+  min-height: 64px;
   border: 1px dashed #e2e2e2;
   background: linear-gradient(90deg, #faf9f6, #f7f7f7, #faf9f6);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #aaa;
-  font-size: 12px;
-  letter-spacing: 1px;
   margin-bottom: 18px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.ad-banner-link {
+  display: block;
+  width: 100%;
+  line-height: 0;
+  transition: opacity 0.15s;
+}
+.ad-banner-link:hover {
+  opacity: 0.95;
+}
+.ad-banner-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 136px;
+  object-fit: contain;
 }
 
 /* ----------------------------------------------------------------
@@ -695,24 +728,75 @@ main { padding: 18px 18px 30px; }
   height: 37px;
   background: #fcfcfc;
 }
-.widget-tab {
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  background: var(--red);
-  color: #fff;
-  cursor: default;
-}
-.widget-tab-sub {
+.widget-tab,
+button.widget-tab {
   display: flex;
   align-items: center;
   padding: 0 16px;
   background: transparent;
   color: #666;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+.widget-tab.active,
+button.widget-tab.active {
+  background: var(--red);
+  color: #fff;
+  cursor: default;
+}
+
+.widget-tab-sub,
+button.widget-tab-sub {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background: transparent;
+  color: #666;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
   font-size: 13.5px;
   font-weight: normal;
   letter-spacing: 0.5px;
+  line-height: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+.widget-tab-sub.active,
+button.widget-tab-sub.active {
+  background: var(--red);
+  color: #fff;
+  font-weight: bold;
   cursor: default;
+}
+.widget-tab:hover:not(.active),
+.widget-tab-sub:hover:not(.active) {
+  color: var(--red);
+}
+
+/* Market rates promo graphic in sidebar */
+.widget-market-promo {
+  margin-bottom: 16px;
+  border-radius: 2px;
+  overflow: hidden;
+  line-height: 0;
+}
+.widget-market-promo a {
+  display: block;
+  line-height: 0;
+  transition: opacity 0.15s;
+}
+.widget-market-promo a:hover {
+  opacity: 0.94;
+}
+.sidebar-market-img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* Popular list */
@@ -1093,7 +1177,9 @@ main { padding: 18px 18px 30px; }
   .brand { gap: 8px; }
   .brand-mark { font-size: 38px; }
   .brand-copy { font-size: 16px; letter-spacing: 0; }
-  .app-badges { flex: 1; gap: 5px; }
+  .app-badges { flex: 1; gap: 6px; }
+  .store-badge-link { display: inline-flex; }
+  .store-badge-img { width: 120px; height: 38px; }
   .store-badge { min-width: 0; height: 38px; flex: 1; padding: 3px 6px; gap: 5px; }
   .store-icon { font-size: 17px; }
   .store-badge small { font-size: 7px; }
@@ -1115,7 +1201,8 @@ main { padding: 18px 18px 30px; }
 
   /* Main */
   main { padding: 10px 10px 20px; }
-  .ad-placeholder { height: 44px; margin-bottom: 12px; font-size: 10px; }
+  .ad-placeholder { min-height: 44px; margin-bottom: 12px; }
+  .ad-banner-img { max-height: 60px; }
 
   /* Hero */
   .hero-carousel { aspect-ratio: 1.1; min-height: 240px; }
@@ -1127,6 +1214,10 @@ main { padding: 18px 18px 30px; }
   /* Sidebar */
   .sidebar { grid-template-columns: 1fr; }
   .side-note { grid-column: auto; }
+  .widget-tab, button.widget-tab,
+  .widget-tab-sub, button.widget-tab-sub { padding: 0 12px; font-size: 13px; }
+  .widget-market-promo { margin-bottom: 14px; }
+  .sidebar-market-img { width: 100%; }
 
   /* Category */
   .category-feed { margin-top: 16px; }
