@@ -1,0 +1,1 @@
+window.SHANGBAO_IMAGES = {};
