@@ -14,16 +14,18 @@
 
   /**
    * Determine initial candidate image source for an article.
-   * Priority: (1) assets/img/<id>.jpg (2) manual map (3) pool (4) placeholder
+   * Priority: (1) manual map in SHANGBAO_IMAGES (2) deterministic pool (3) verified default local photo
    */
   function getCandidateSrc(a) {
-    if (IMG[a.id]) return IMG[a.id];
-    if (POOL.length > 0) {
+    const map = window.SHANGBAO_IMAGES || IMG;
+    if (a && a.id && map[a.id]) return map[a.id];
+    const pool = (window.SHANGBAO_IMAGE_POOL && window.SHANGBAO_IMAGE_POOL.length) ? window.SHANGBAO_IMAGE_POOL : POOL;
+    if (pool.length > 0 && a && a.id) {
       let hash = 0;
       for (let i = 0; i < a.id.length; i++) hash = ((hash << 5) - hash + a.id.charCodeAt(i)) | 0;
-      return POOL[Math.abs(hash) % POOL.length];
+      return pool[Math.abs(hash) % pool.length];
     }
-    return `assets/images/articles/${encodeURIComponent(a.id)}.jpg`;
+    return pool.length > 0 ? pool[0] : 'assets/images/placeholders/news-placeholder.svg';
   }
 
   function scene(a, className='') {
