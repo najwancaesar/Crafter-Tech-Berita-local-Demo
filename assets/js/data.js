@@ -116,7 +116,7 @@ window.SHANGBAO_DATA = {
     "berita-luar-negeri-1793020357",
     "sports-1792943277",
     "economy-1793073564",
-    "chinese-community-1792942692",
+    "chinese-community-1792771332",
     "hukum-1792767922",
     "financial-1793069962"
   ],

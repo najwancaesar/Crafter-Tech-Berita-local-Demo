@@ -124,39 +124,88 @@
       `<li><span class="popular-num">${String(i + 1).padStart(2, '0')}</span>${articleLink(a)}</li>`
     ).join('') || '<li>暂无推荐新闻</li>';
 
-    const quick = data.articles.slice(0, 2);
+    // Selected News / Highlights: 4 short news entries with non-repeating photos
+    const highlightIds = [
+      'politics-1792679463',          // President moment.jpg
+      'metropolitan-1792764926',      // Train.jpg
+      'chinese-community-1792771116', // Speech.jpg
+      'editorial-1793022053'          // Sir purbaya.jpg
+    ];
+    const quick = highlightIds.map(id => byId.get(id)).filter(Boolean);
     const sideHighlights = $('#sideHighlights');
     if (sideHighlights) {
       sideHighlights.innerHTML = quick.map(a =>
-        `<article class="side-highlight">${scene(a)}<div><h3>${articleLink(a)}</h3><p>${esc(sourceDate(a))}</p></div></article>`
+        `<article class="side-highlight">${scene(a)}<div><h3>${articleLink(a)}</h3><p>⏱ ${esc(sourceDate(a))}</p></div></article>`
       ).join('');
     }
   }
 
   function cardList(ids) { return ids.map(id => byId.get(id)).filter(Boolean); }
 
+  // 12 Prominent Lead Categories (strongest editorial coverage & photos)
+  const FEATURED_CATEGORIES = new Set([
+    '热点新闻',
+    '政治',
+    '法律',
+    '首都动态',
+    '国外新闻',
+    '教育与文化',
+    '华社',
+    '社论',
+    '社会',
+    '特别',
+    '财经',
+    '金融'
+  ]);
+
   function renderCategorySection(category) {
     const stories = cardList(category.articles);
     if (!stories.length) return '';
-    const [lead, ...rest] = stories;
-    return `<section class="category-section" data-category="${esc(category.name)}">
-      <div class="category-heading">
-        <h2>${esc(category.name)}</h2>
-        <a href="#category/${encodeURIComponent(category.name)}" data-category-link="${esc(category.name)}">查看更多 »</a>
-      </div>
-      <article class="lead-story">
-        ${scene(lead)}
-        <div class="story-copy">
-          <h3>${articleLink(lead)}</h3>
-          <div class="meta">⏱ ${esc(sourceDate(lead))}</div>
-          <p>${esc(lead.excerpt || '此 HTML 首页快照未包含完整文章正文。')}</p>
-          <a class="read-more" href="${articleHref(lead)}" data-article-id="${esc(lead.id)}">查看更多 »</a>
+
+    // Check if this category is one of the 12 Featured Lead categories
+    const isFeatured = FEATURED_CATEGORIES.has(category.name);
+
+    if (isFeatured) {
+      // 12 Featured Categories: 1 prominent lead article with large landscape photo + 2x2 supporting grid
+      const [lead, ...rest] = stories;
+      return `<section class="category-section category-featured" data-category="${esc(category.name)}">
+        <div class="category-heading">
+          <h2>${esc(category.name)}</h2>
+          <a href="#category/${encodeURIComponent(category.name)}" data-category-link="${esc(category.name)}">查看更多 »</a>
         </div>
-      </article>
-      ${rest.length ? `<div class="story-grid">${rest.slice(0, 4).map(a =>
-        `<article class="small-story">${scene(a)}<div><h3>${articleLink(a)}</h3><div class="meta">⏱ ${esc(sourceDate(a))}</div></div></article>`
-      ).join('')}</div>` : ''}
-    </section>`;
+        <article class="lead-story">
+          ${scene(lead)}
+          <div class="story-copy">
+            <h3>${articleLink(lead)}</h3>
+            <div class="meta">⏱ ${esc(sourceDate(lead))}</div>
+            <p>${esc(lead.excerpt || '此页面快照未包含完整文章正文。')}</p>
+            <a class="read-more" href="${articleHref(lead)}" data-article-id="${esc(lead.id)}">查看更多 »</a>
+          </div>
+        </article>
+        ${rest.length ? `<div class="story-grid">${rest.slice(0, 4).map(a =>
+          `<article class="small-story">${scene(a)}<div><h3>${articleLink(a)}</h3><div class="meta">⏱ ${esc(sourceDate(a))}</div></div></article>`
+        ).join('')}</div>` : ''}
+      </section>`;
+    } else {
+      // 8 Compact Categories: Compact layout with smaller thumbnails, headlines, publication dates, and category link
+      return `<section class="category-section category-compact" data-category="${esc(category.name)}">
+        <div class="category-heading">
+          <h2>${esc(category.name)}</h2>
+          <a href="#category/${encodeURIComponent(category.name)}" data-category-link="${esc(category.name)}">查看更多 »</a>
+        </div>
+        <div class="compact-grid">
+          ${stories.map(a =>
+            `<article class="compact-story">
+              ${scene(a, 'compact-scene')}
+              <div class="compact-copy">
+                <h3>${articleLink(a)}</h3>
+                <div class="meta">⏱ ${esc(sourceDate(a))}</div>
+              </div>
+            </article>`
+          ).join('')}
+        </div>
+      </section>`;
+    }
   }
 
   function renderCategories(filterName=null) {

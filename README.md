@@ -61,20 +61,22 @@ shangbao-reconstruction/
 
 ---
 
-## Two-Column Persistent Layout & Content Architecture
+## Two-Column Editorial Layout & Content Architecture
 
 The homepage is organized as a persistent two-column grid (`.content-layout`):
 
 1. **Main Column (`.main-column`, ~74.5%):**
    - **Hero Carousel:** 10 headline slides with local editorial photographs, timer controls, and navigation dots.
    - **Search Results (`#searchResults`):** Instant client-side search across all 91 articles.
-   - **Category Feed (`#categoryFeed`):** News categories with lead stories (1.38 ratio photo + excerpt + read more) followed by 4-story thumbnail grids.
+   - **12 Featured Lead Categories (`.category-featured`):** Core news pillars with prominent lead stories (1.38 ratio photo + excerpt + read more) followed by 2×2 thumbnail grids (热点新闻, 政治, 法律, 首都动态, 国外新闻, 教育与文化, 华社, 社论, 社会, 特别, 财经, 金融).
+   - **8 Compact Categories (`.category-compact`):** Clean 2-column compact story cards with proportional 88px thumbnails and meta dates, optimizing vertical rhythm (科学与技术, 评论, 健康知识, 体育, 娱乐, 人民福利, 宗教, 东盟动态).
    - **Article View (`#articleView`):** Clean single-article reading view.
-2. **Persistent Sidebar (`.sidebar`, ~25.5%):**
+2. **Sidebar (`.sidebar`, ~25.5%):**
    - **Popular News Widget:** Tabbed interface ("热文推荐" / "最多阅读者") with ranked 01–05 numbers.
    - **Market Trends Banner:** Integrated `finance.jpg` market movements card.
    - **E-Paper Card:** Integrated `e-paper2.jpg` digital edition subscription banner.
-   - **Today's News Highlights:** Curated thumbnail stories.
+   - **Today's News Highlights:** 4 curated thumbnail stories with non-repeating local photographs.
+   - **Sidebar Advertisement:** Integrated commercial sponsorship placement.
 
 ---
 

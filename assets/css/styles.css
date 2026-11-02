@@ -712,22 +712,11 @@ main { padding: 18px 18px 30px; }
 }
 
 /* ----------------------------------------------------------------
-   SIDEBAR
+   SIDEBAR — Natural independent column (no internal sticky scroll)
    ---------------------------------------------------------------- */
 .sidebar {
   min-width: 0;
-  /* Sticky so sidebar remains visible as user scrolls through 20 category sections */
-  position: sticky;
-  top: 0;
-  max-height: 100vh;
-  overflow-y: auto;
-  /* Subtle scrollbar */
-  scrollbar-width: thin;
-  scrollbar-color: #ddd #fafafa;
 }
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-track { background: #fafafa; }
-.sidebar::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
 
 .widget {
   border: 1px solid var(--line);
@@ -837,6 +826,30 @@ button.widget-tab-sub.active {
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* Sidebar advertisement widget */
+.widget-ad-slot {
+  margin-bottom: 16px;
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid #ebebeb;
+  background: #fafafa;
+}
+.sidebar-ad-link {
+  display: block;
+  line-height: 0;
+  transition: opacity 0.15s;
+}
+.sidebar-ad-link:hover {
+  opacity: 0.95;
+}
+.sidebar-ad-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 120px;
+  object-fit: cover;
 }
 
 /* Popular list */
@@ -969,6 +982,51 @@ button.widget-tab-sub.active {
 .small-story h3 { margin: 0 0 4px; font-size: 13px; line-height: 1.45; font-weight: 600; color: #222; }
 .small-story h3 a:hover { color: var(--red); }
 .small-story .meta { font-size: 10px; color: #999; }
+
+/* ----------------------------------------------------------------
+   COMPACT CATEGORY (8 Secondary Categories)
+   Cleaner, balanced vertical rhythm with smaller thumbnails & compact grid
+   ---------------------------------------------------------------- */
+.category-section.category-compact {
+  padding: 0 0 16px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid #f0f0f0;
+}
+.compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 18px;
+  padding: 8px 0 0;
+}
+.compact-story {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  align-items: start;
+}
+.compact-story .news-scene {
+  aspect-ratio: 1.25;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.compact-copy {
+  min-width: 0;
+}
+.compact-copy h3 {
+  margin: 0 0 4px;
+  font-size: 13.5px;
+  line-height: 1.42;
+  font-weight: 600;
+  color: #222;
+}
+.compact-copy h3 a:hover {
+  color: var(--red);
+}
+.compact-copy .meta {
+  font-size: 10.5px;
+  color: #999;
+}
 
 /* ----------------------------------------------------------------
    NEWS SCENE — photo slot + CSS abstract fallback
@@ -1279,6 +1337,9 @@ button.widget-tab-sub.active {
   .story-grid { gap: 12px; grid-template-columns: 1fr; padding-inline: 0; }
   .small-story { grid-template-columns: 95px minmax(0, 1fr); }
   .small-story h3 { font-size: 13px; }
+  .compact-grid { grid-template-columns: 1fr; gap: 10px; padding-inline: 0; }
+  .compact-story { grid-template-columns: 80px minmax(0, 1fr); }
+  .compact-copy h3 { font-size: 13px; }
 
   /* Search results */
   .result-list { grid-template-columns: 1fr; }
