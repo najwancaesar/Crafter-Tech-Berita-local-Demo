@@ -10,7 +10,7 @@
 <body>
   <a class="skip-link" href="#main">跳到主要内容</a>
 
-  <!-- ═══════════════════════════════════════════════════════
+  <!-- ═══════-════════════════════════════════════════════════
        SITE SHELL — outer dark wrapper, inner white container
   ═══════════════════════════════════════════════════════ -->
   <div class="site-shell">
@@ -97,7 +97,7 @@
     <!-- /TICKER -->
 
     <!-- ═══════════════════════════════════════════════════
-         MAIN — top grid + category feed
+         MAIN — two-column layout: main-column + persistent sidebar
     ═══════════════════════════════════════════════════ -->
     <main id="main">
 
@@ -108,22 +108,38 @@
         </a>
       </div>
 
-      <!-- TOP GRID — hero carousel + sidebar -->
-      <section class="top-grid" id="topGrid" aria-label="头条新闻和推荐内容">
+      <!-- TWO-COLUMN CONTENT LAYOUT -->
+      <div class="content-layout">
 
-        <!-- HERO CAROUSEL -->
-        <div class="hero-area">
-          <div id="heroCarousel" class="hero-carousel"></div>
-          <div class="carousel-controls">
-            <button type="button" id="prevSlide" aria-label="上一条新闻">‹</button>
-            <button type="button" id="nextSlide" aria-label="下一条新闻">›</button>
-          </div>
-          <div class="carousel-dots" id="carouselDots" aria-label="选择头条新闻"></div>
+        <!-- MAIN COLUMN (approx 74.5%) -->
+        <div class="main-column" id="mainColumn">
+
+          <!-- HERO CAROUSEL -->
+          <section class="hero-area" id="heroArea" aria-label="头条新闻">
+            <div id="heroCarousel" class="hero-carousel"></div>
+            <div class="carousel-controls">
+              <button type="button" id="prevSlide" aria-label="上一条新闻">‹</button>
+              <button type="button" id="nextSlide" aria-label="下一条新闻">›</button>
+            </div>
+            <div class="carousel-dots" id="carouselDots" aria-label="选择头条新闻"></div>
+          </section>
+          <!-- /HERO CAROUSEL -->
+
+          <!-- SEARCH RESULTS (hidden by default) -->
+          <section id="searchResults" class="search-results" hidden aria-live="polite"></section>
+
+          <!-- CATEGORY FEED -->
+          <section id="categoryFeed" class="category-feed" aria-label="新闻分类"></section>
+
+          <!-- ARTICLE VIEW (hidden by default) -->
+          <section id="articleView" class="article-view" hidden></section>
+
         </div>
-        <!-- /HERO CAROUSEL -->
+        <!-- /MAIN COLUMN -->
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar" aria-label="推荐新闻">
+        <!-- SIDEBAR (approx 25.5%, persistent alongside main column) -->
+        <aside class="sidebar" id="sidebar" aria-label="推荐新闻与侧边专栏">
+
           <!-- Widget: Popular News -->
           <section class="widget">
             <div class="widget-title">
@@ -133,14 +149,22 @@
             <ol class="popular-list" id="popularList"></ol>
           </section>
 
-          <!-- Widget: Market Rates / Trends Banner matching reference screenshot -->
+          <!-- Widget: Market Rates / Finance Banner -->
           <div class="widget-market-promo" aria-label="市场行情">
-            <a href="#category/财经">
-              <img src="assets/images/sidebar/market-trends.svg" alt="市场行情" class="sidebar-market-img">
+            <a href="#category/财经" class="sidebar-banner-link" aria-label="查看财经市场行情">
+              <img src="assets/images/sidebar/finance.jpg" alt="市场行情看板" class="sidebar-market-img"
+                onerror="this.src='assets/images/sidebar/market-trends.svg'">
             </a>
           </div>
 
-          <!-- Widget: Side Highlights -->
+          <!-- Widget: E-Paper Promotional Banner -->
+          <div class="widget-epaper-promo" aria-label="印尼商报电子报">
+            <a href="#epaper" class="sidebar-banner-link" aria-label="阅读印尼商报电子报">
+              <img src="assets/images/sidebar/e-paper2.jpg" alt="印尼商报电子报 (E-Paper)" class="sidebar-epaper-img">
+            </a>
+          </div>
+
+          <!-- Widget: Side Highlights / Today's News -->
           <section class="widget side-promo">
             <div class="widget-title">
               <span class="widget-tab active">今日要闻</span>
@@ -148,27 +172,11 @@
             <div id="sideHighlights"></div>
           </section>
 
-          <!-- Widget: About Demo -->
-          <section class="widget side-note">
-            <div class="widget-title">
-              <span class="widget-tab active">关于本演示</span>
-            </div>
-            <p>此页面用于学习网页结构重建。快照未附带原站图片资源文件夹，因此图片区域使用可替换占位图。</p>
-          </section>
         </aside>
         <!-- /SIDEBAR -->
 
-      </section>
-      <!-- /TOP GRID -->
-
-      <!-- SEARCH RESULTS (hidden by default) -->
-      <section id="searchResults" class="search-results" hidden aria-live="polite"></section>
-
-      <!-- CATEGORY FEED -->
-      <section id="categoryFeed" class="category-feed" aria-label="新闻分类"></section>
-
-      <!-- ARTICLE VIEW (hidden by default) -->
-      <section id="articleView" class="article-view" hidden></section>
+      </div>
+      <!-- /TWO-COLUMN CONTENT LAYOUT -->
 
     </main>
     <!-- /MAIN -->

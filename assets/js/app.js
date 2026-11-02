@@ -167,33 +167,50 @@
       feed.innerHTML = `<div class="empty-state">没有找到「${esc(filterName)}」分类。 <a href="#home">返回首页</a></div>`;
       return;
     }
-    const primary = cats.filter(c => c.name !== '财经' && c.name !== '金融');
-    const business = cats.filter(c => c.name === '财经' || c.name === '金融');
-    const left = primary.map(renderCategorySection).join('');
-    const right = business.map(renderCategorySection).join('');
-    feed.innerHTML = `<div class="category-column">${left || '<div class="empty-state">该分类暂无文章。</div>'}</div><aside class="category-column">${right || (!filterName ? '<section class="widget"><h2 class="widget-title"><span class="widget-tab active">新闻分类</span><span class="widget-tab-sub">快照数据</span></h2><div class="side-note"><p>点击上方栏目可筛选相关内容。完整文章正文需要从原始内容源另行取得。</p></div></section>' : '')}</aside>`;
+    feed.innerHTML = cats.map(renderCategorySection).join('');
   }
 
   function renderSearch(query) {
     const q = text(query).toLocaleLowerCase();
     const box = $('#searchResults');
-    if (!q) { box.hidden = true; box.innerHTML = ''; $('#categoryFeed').hidden = false; return; }
+    const hero = $('#heroArea');
+    if (!q) {
+      box.hidden = true;
+      box.innerHTML = '';
+      if (hero) hero.hidden = false;
+      $('#categoryFeed').hidden = false;
+      return;
+    }
     const results = data.articles.filter(a => `${a.title} ${a.category} ${a.excerpt}`.toLocaleLowerCase().includes(q)).slice(0, 40);
-    box.hidden = false; $('#categoryFeed').hidden = true;
+    box.hidden = false;
+    if (hero) hero.hidden = true;
+    $('#categoryFeed').hidden = true;
     box.innerHTML = `<h2>搜索结果：${esc(query)} <small>（${results.length} 条）</small></h2>${results.length ? `<div class="result-list">${results.map(a => `<article class="result-card">${scene(a)}<div><h3>${articleLink(a)}</h3><div class="meta">${esc(a.category)} · ${esc(sourceDate(a))}</div><p>${esc(a.excerpt||'首页快照未包含正文。')}</p></div></article>`).join('')}</div>` : '<p>没有找到匹配的新闻标题或摘要。</p>'}`;
   }
 
   function openArticle(id) {
     const a = byId.get(id);
     if (!a) return;
-    $('#topGrid').hidden = true; $('.ad-placeholder').hidden = true; $('#categoryFeed').hidden = true; $('#searchResults').hidden = true; $('#articleView').hidden = false;
+    const hero = $('#heroArea');
+    if (hero) hero.hidden = true;
+    const ad = $('.ad-placeholder');
+    if (ad) ad.hidden = true;
+    $('#categoryFeed').hidden = true;
+    $('#searchResults').hidden = true;
+    $('#articleView').hidden = false;
     $('#articleView').innerHTML = `<a class="back-link" href="#home">← 返回首页</a><article><div class="meta">${esc(a.category)} · ${esc(sourceDate(a))}</div><h1>${esc(a.title)}</h1>${scene(a)}<p class="article-lead">${esc(a.excerpt || '此页面快照未包含这篇文章的完整正文。')}</p><div class="article-note">说明：提供的 HTML 是首页快照，并没有完整新闻正文。这里展示的是可用于重建 UI 的本地文章预览，而非原文全文。</div><p><a class="source-link" href="${esc(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">在 Shangbao 原网站打开这篇文章 ↗</a></p></article>`;
     document.title = `${a.title} - Shangbao Indonesia | Reconstruction`;
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
   function showHome() {
-    $('#topGrid').hidden = false; $('.ad-placeholder').hidden = false; $('#articleView').hidden = true; $('#categoryFeed').hidden = false; $('#searchResults').hidden = true;
+    const hero = $('#heroArea');
+    if (hero) hero.hidden = false;
+    const ad = $('.ad-placeholder');
+    if (ad) ad.hidden = false;
+    $('#articleView').hidden = true;
+    $('#categoryFeed').hidden = false;
+    $('#searchResults').hidden = true;
     renderCategories();
     document.title = '首页 - Shangbao Indonesia | Reconstruction';
   }
@@ -203,8 +220,17 @@
     if (hash.startsWith('#article/')) { openArticle(decodeURIComponent(hash.slice('#article/'.length))); return; }
     if (hash.startsWith('#category/')) {
       const cat = hash.slice('#category/'.length);
-      $('#topGrid').hidden = false; $('.ad-placeholder').hidden = false; $('#articleView').hidden = true; $('#searchResults').hidden = true; $('#categoryFeed').hidden = false;
-      renderCategories(cat); document.title = `${cat} - Shangbao Indonesia | Reconstruction`; window.scrollTo({top: 0, behavior: 'smooth'}); return;
+      const hero = $('#heroArea');
+      if (hero) hero.hidden = true;
+      const ad = $('.ad-placeholder');
+      if (ad) ad.hidden = false;
+      $('#articleView').hidden = true;
+      $('#searchResults').hidden = true;
+      $('#categoryFeed').hidden = false;
+      renderCategories(cat);
+      document.title = `${cat} - Shangbao Indonesia | Reconstruction`;
+      window.scrollTo({top: 0, behavior: 'smooth'});
+      return;
     }
     showHome();
     const navLinks = $$('.nav-link');

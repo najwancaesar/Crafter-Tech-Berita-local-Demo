@@ -2,9 +2,9 @@
 
 This is a **pure frontend reconstruction prototype** of the Shangbao Indonesia homepage, developed with **HTML5, CSS3, and Vanilla JavaScript**. It uses local assets with no external build tools, no Node.js runtime dependencies, and no framework overhead.
 
-The frontend is specifically prepared to be portable into **CrafterCMS** as a FreeMarker templated project.
+The frontend is specifically prepared to be portable into **CrafterCMS 4.x** as a FreeMarker templated project.
 
-> See [`DESIGN_TOKENS.md`](./DESIGN_TOKENS.md) for all measured design values and [`GAP_REPORT.md`](./GAP_REPORT.md) for the detailed visual comparison against original screenshots.
+> See [`docs/DESIGN_TOKENS.md`](./docs/DESIGN_TOKENS.md) for all measured design values, [`docs/IMAGE_ASSET_CATALOG.md`](./docs/IMAGE_ASSET_CATALOG.md) for the complete image inventory, and [`docs/GAP_REPORT.md`](./docs/GAP_REPORT.md) for the detailed visual comparison against original screenshots.
 
 ---
 
@@ -17,7 +17,6 @@ Because this project uses pure static web standards with all prototype data bund
 
 2. **Option 2 (Local Web Server):**
    - **Laragon / Apache:** Already hosted if placed in `c:\laragon\www\shangbao-reconstruction\` (open `http://localhost/shangbao-reconstruction/` or `http://shangbao-reconstruction.test/`).
-   - **Windows batch launcher:** Double-click `serve.bat`.
    - **Any static server:** `python -m http.server 8000` or PHP built-in server `php -S localhost:8000`.
 
 ---
@@ -27,7 +26,7 @@ Because this project uses pure static web standards with all prototype data bund
 - **Markup:** Semantic HTML5 with accessibility attributes (`aria-*`, skip-links, role attributes)
 - **Styling:** Modern responsive CSS3 with CSS Custom Properties (Design Tokens), flexbox, grid, and fluid typography (`clamp()`)
 - **Scripting:** Pure Vanilla JavaScript (ES6+), zero external runtime dependencies, native DOM manipulation
-- **Media:** Clean local image assets and crisp vector SVGs (brand badges, icons, banners, charts)
+- **Media:** Clean local image assets (36 editorial photographs + 2 promotional banners) and crisp vector SVGs (brand badges, icons, banners, charts)
 
 ---
 
@@ -36,28 +35,46 @@ Because this project uses pure static web standards with all prototype data bund
 ```text
 shangbao-reconstruction/
 ├── index.html                  ← Main frontend markup (with CrafterCMS block boundaries)
-├── DESIGN_TOKENS.md            ← All measured colors, typography, dimensions, and spacing
-├── GAP_REPORT.md               ← Visual comparison report vs original screenshot
 ├── README.md                   ← Project documentation and execution instructions
-├── SOURCE_ANALYSIS.md          ← Analysis of the original snapshot
 ├── NOTICE.txt                  ← Legal notices and usage constraints
+├── docs/                       ← Specification and verification documentation
+│   ├── DESIGN_TOKENS.md        ← All measured colors, typography, dimensions, and spacing
+│   ├── GAP_REPORT.md           ← Visual comparison report vs original screenshot
+│   ├── IMAGE_ASSET_CATALOG.md  ← Complete 38-asset inventory, metadata, and mapping
+│   └── SOURCE_ANALYSIS.md      ← Detailed reverse engineering of the original snapshot
 ├── assets/
 │   ├── css/
 │   │   └── styles.css          ← Author-crafted CSS rules based on measured tokens
 │   ├── js/
-│   │   ├── data.js             ← Extracted article records and navigation data
-│   │   ├── images.js           ← Image mapping, pool manager, and fallback logic
+│   │   ├── data.js             ← 91 audited article records with provenance flags
+│   │   ├── images.js           ← Deterministic image mapping, pool manager, and fallback
 │   │   └── app.js              ← Vanilla JS rendering, routing, clock, and UI interactions
 │   └── images/
 │       ├── brand/              ← Logos, Google Play badge, App Store badge (SVG)
-│       ├── backgrounds/        ← Outer vignette and background textures
-│       ├── banners/            ← Header advertising banner (SVG / responsive)
-│       ├── articles/           ← Local article photographs (JPG / PNG / WebP)
-│       ├── sidebar/            ← Sidebar market chart graphic (SVG)
+│       ├── backgrounds/        ← Outer vignette and background textures (SVG)
+│       ├── banners/            ← Header advertising banner (SVG)
+│       ├── articles/           ← Canonical editorial photographs (JPG)
+│       ├── sidebar/            ← E-Paper banner & market trends graphics (JPG & SVG)
 │       └── placeholders/       ← High-resolution fallback placeholders (SVG)
-├── reference-shots/            ← Original reference screenshots for visual validation
-└── reference/                  ← Original snapshot HTML (gitignored)
+└── reference-shots/            ← Original reference screenshots for visual validation
 ```
+
+---
+
+## Two-Column Persistent Layout & Content Architecture
+
+The homepage is organized as a persistent two-column grid (`.content-layout`):
+
+1. **Main Column (`.main-column`, ~74.5%):**
+   - **Hero Carousel:** 10 headline slides with local editorial photographs, timer controls, and navigation dots.
+   - **Search Results (`#searchResults`):** Instant client-side search across all 91 articles.
+   - **Category Feed (`#categoryFeed`):** News categories with lead stories (1.38 ratio photo + excerpt + read more) followed by 4-story thumbnail grids.
+   - **Article View (`#articleView`):** Clean single-article reading view.
+2. **Persistent Sidebar (`.sidebar`, ~25.5%):**
+   - **Popular News Widget:** Tabbed interface ("热文推荐" / "最多阅读者") with ranked 01–05 numbers.
+   - **Market Trends Banner:** Integrated `finance.jpg` market movements card.
+   - **E-Paper Card:** Integrated `e-paper2.jpg` digital edition subscription banner.
+   - **Today's News Highlights:** Curated thumbnail stories.
 
 ---
 
@@ -65,11 +82,11 @@ shangbao-reconstruction/
 
 Images are managed with a multi-tier fallback mechanism in `assets/js/images.js` without requiring build steps:
 
-1. **Specific article file:** `assets/images/articles/<id-artikel>.(jpg|png|webp)` (or legacy `assets/img/`)
-2. **Manual mapping:** Explicitly mapped in `window.SHANGBAO_IMAGES` in `images.js`
-3. **Pool distribution:** Round-robin allocation from `window.SHANGBAO_IMAGE_POOL` across articles
-4. **Clean SVG placeholder:** `assets/images/placeholders/news-placeholder.svg`
-5. **CSS abstract scene:** Pure CSS visual placeholder if image loading fails
+1. **Deterministic mapping:** Explicitly mapped in `window.SHANGBAO_IMAGES` in `images.js` (36 editorial photos matched to corresponding stories).
+2. **Specific article file:** `assets/images/articles/<id-artikel>.(jpg|png|webp)`.
+3. **Pool distribution:** Round-robin allocation from `window.SHANGBAO_IMAGE_POOL` across unpinned articles.
+4. **Clean SVG placeholder:** `assets/images/placeholders/news-placeholder.svg` (or `hero-placeholder.svg`).
+5. **CSS abstract scene:** Pure CSS visual placeholder if image loading fails.
 
 Slot aspect ratios are strictly preserved with `object-fit: cover`:
 - Carousel hero: `1.87` (or `1.76`)
@@ -81,7 +98,7 @@ Slot aspect ratios are strictly preserved with `object-fit: cover`:
 
 ## CrafterCMS Integration Readiness
 
-The source is structured with clear separation of concerns to enable seamless porting into CrafterCMS:
+The source is structured with clear separation of concerns to enable seamless porting into CrafterCMS 4.x:
 
 - **Presentation (`index.html` & `styles.css`):**
   - Section blocks are explicitly demarcated with header comments (`HEADER`, `NAV PRIMARY`, `NAV SECONDARY`, `MASTHEAD`, `TICKER`, `HERO CAROUSEL`, `SIDEBAR`, `CATEGORY FEED`, `FOOTER`).
@@ -90,6 +107,6 @@ The source is structured with clear separation of concerns to enable seamless po
 - **Client Interactions (`app.js`):**
   - UI behaviors (navigation toggling, carousel cycling, search filtering, sidebar tabs, live clock) operate on clean DOM selectors independently of the data source.
 - **Content Data (`data.js`):**
-  - Prototype data structure (`navigation`, `ticker`, `features`, `categories`, `popular`, `articles`) mimics typical CMS content model schemas.
+  - 91 article records with `summarySource: "original-snapshot"` for genuine lead articles and `summarySource: "headline-derived-demo"` for contextual previews.
 - **Media Assets (`assets/images/`):**
-  - Organized by domain (`brand/`, `banners/`, `articles/`, `sidebar/`, `placeholders/`), ready to be relocated into CrafterCMS asset management paths (e.g., `/static-assets/images/...`).
+  - Canonical lowercase directories (`brand/`, `banners/`, `articles/`, `sidebar/`, `placeholders/`), ready to be relocated into CrafterCMS asset paths (`/static-assets/images/...`).
