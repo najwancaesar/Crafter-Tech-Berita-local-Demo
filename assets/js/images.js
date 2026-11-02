@@ -73,7 +73,34 @@ window.SHANGBAO_IMAGES = window.SHANGBAO_IMAGES || {
 
   // 教育与文化 (Education & Culture)
   "pendidikan-kebudayaan-1792159968": "assets/images/articles/PKD.jpg",
-  "pendidikan-kebudayaan-1791905274": "assets/images/articles/National working reference.jpg"
+  "pendidikan-kebudayaan-1791905274": "assets/images/articles/National working reference.jpg",
+
+  // 国外新闻 (Foreign News)
+  "berita-luar-negeri-1793020357": "assets/images/articles/President - moment 2.jpg",
+
+  // 科学与技术 (Science & Technology)
+  "science-technology-1792595097": "assets/images/articles/Teamwork relationships.jpg",
+
+  // 健康知识 (Health Knowledge)
+  "kesehatan-1792744525": "assets/images/articles/National working reference.jpg",
+
+  // 体育 (Sports)
+  "sports-1792943277": "assets/images/articles/Meet up.jpg",
+
+  // 特别 (Special Features)
+  "special-news-1789913890": "assets/images/articles/Speech.jpg",
+
+  // 娱乐 (Entertainment)
+  "entertainment-1793026627": "assets/images/articles/Images-2.jpg",
+
+  // 人民福利 (Public Welfare / Kesra)
+  "kesra-1792935381": "assets/images/articles/Bolts material.jpg",
+
+  // 宗教 (Religion)
+  "agama-1790603125": "assets/images/articles/Suhut.jpg",
+
+  // 东盟动态 (ASEAN)
+  "asean-1792942737": "assets/images/articles/Speech-2.jpg"
 };
 
 // Priority 3: Local image pool shared round-robin across unpinned articles.
