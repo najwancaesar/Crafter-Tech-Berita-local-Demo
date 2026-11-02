@@ -537,7 +537,7 @@ main { padding: 18px 18px 30px; }
   display: grid;
   grid-template-columns: minmax(0, 74.5%) minmax(0, 25.5%);
   gap: 20px;
-  align-items: start;
+  align-items: start; /* Important: allows sticky sidebar */
 }
 
 .main-column {
@@ -714,7 +714,20 @@ main { padding: 18px 18px 30px; }
 /* ----------------------------------------------------------------
    SIDEBAR
    ---------------------------------------------------------------- */
-.sidebar { min-width: 0; }
+.sidebar {
+  min-width: 0;
+  /* Sticky so sidebar remains visible as user scrolls through 20 category sections */
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  /* Subtle scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #ddd #fafafa;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: #fafafa; }
+.sidebar::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
 
 .widget {
   border: 1px solid var(--line);
@@ -882,14 +895,17 @@ button.widget-tab-sub.active {
   display: block;
   margin-top: 24px;
 }
-}
 
 .category-column { min-width: 0; }
 
 .category-section {
-  padding: 0 0 18px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--line);
+  padding: 0 0 20px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+/* First category (热点新闻) gets extra top spacing */
+.category-section:first-child {
+  padding-top: 4px;
 }
 
 /* Category heading — Red text + red underline matching reference screenshot */
@@ -897,36 +913,40 @@ button.widget-tab-sub.active {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  border-bottom: 2px solid var(--red);
-  margin: 0 0 14px;
-  padding-bottom: 5px;
+  border-bottom: 3px solid var(--red);
+  margin: 0 0 12px;
+  padding-bottom: 6px;
 }
 .category-heading h2 {
-  font-size: 20px;
+  font-size: 19px;
   margin: 0;
   color: var(--red);
   background: transparent;
   padding: 0;
   font-weight: bold;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  text-transform: none;
 }
 .category-heading a {
   font-size: 12px;
-  color: #777;
+  color: #999;
   padding: 0 4px;
+  white-space: nowrap;
 }
 .category-heading a:hover { color: var(--red); }
 
 /* Lead story (image + text) */
 .lead-story {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 18px;
-  padding: 0 2px 14px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 16px;
+  padding: 0 0 14px;
   border-bottom: 1px solid #eee;
 }
 .lead-story .news-scene { aspect-ratio: 1.38; }
-.story-copy h3 { margin: 0 0 8px; font-size: 18px; line-height: 1.35; font-weight: 600; }
+.story-copy { padding-top: 2px; }
+.story-copy h3 { margin: 0 0 8px; font-size: 17px; line-height: 1.4; font-weight: 700; color: #222; }
+.story-copy h3 a:hover { color: var(--red); }
 .story-copy .meta { margin-bottom: 8px; }
 .story-copy p { margin: 0 0 10px; font-size: 13px; line-height: 1.75; color: #666; }
 .read-more { display: inline-block; font-size: 12px; color: var(--red); font-weight: bold; }
@@ -936,18 +956,19 @@ button.widget-tab-sub.active {
 .story-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 18px;
-  padding: 14px 2px 0;
+  gap: 14px 16px;
+  padding: 14px 0 0;
 }
 .small-story {
   display: grid;
-  grid-template-columns: 100px minmax(0, 1fr);
+  grid-template-columns: 90px minmax(0, 1fr);
   gap: 10px;
   min-width: 0;
 }
-.small-story .news-scene { aspect-ratio: 1.35; }
-.small-story h3 { margin: 0 0 4px; font-size: 13.5px; line-height: 1.4; font-weight: 600; }
-.small-story .meta { font-size: 10px; }
+.small-story .news-scene { aspect-ratio: 1.2; border-radius: 2px; overflow: hidden; }
+.small-story h3 { margin: 0 0 4px; font-size: 13px; line-height: 1.45; font-weight: 600; color: #222; }
+.small-story h3 a:hover { color: var(--red); }
+.small-story .meta { font-size: 10px; color: #999; }
 
 /* ----------------------------------------------------------------
    NEWS SCENE — photo slot + CSS abstract fallback
@@ -958,6 +979,7 @@ button.widget-tab-sub.active {
   isolation: isolate;
   min-width: 0;
   background: #25292b;
+  border-radius: 2px;
 }
 
 .news-photo {
@@ -965,6 +987,7 @@ button.widget-tab-sub.active {
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 2px;
 }
 
 /* Abstract placeholder scene (shown if image fails or missing) */

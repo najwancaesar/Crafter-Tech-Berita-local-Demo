@@ -13,12 +13,8 @@ window.SHANGBAO_DATA = {
       "path": ""
     },
     {
-      "label": "金融",
-      "path": "financial"
-    },
-    {
-      "label": "财经",
-      "path": "economy"
+      "label": "热点新闻",
+      "path": "hot-news"
     },
     {
       "label": "政治",
@@ -89,6 +85,14 @@ window.SHANGBAO_DATA = {
       "path": "asean"
     },
     {
+      "label": "财经",
+      "path": "economy"
+    },
+    {
+      "label": "金融",
+      "path": "financial"
+    },
+    {
       "label": "广告",
       "path": "ads"
     },
@@ -98,23 +102,23 @@ window.SHANGBAO_DATA = {
     }
   ],
   "ticker": [
-    "economy-1793073564",
-    "economy-1793073483",
-    "economy-1793071177",
-    "financial-1793069962",
-    "financial-1793069437"
+    "politics-1793023446",
+    "metropolitan-1793024041",
+    "berita-luar-negeri-1793020357",
+    "society-1793022678",
+    "entertainment-1793026627"
   ],
   "features": [
+    "politics-1793023446",
+    "society-1793022678",
+    "metropolitan-1793024041",
+    "entertainment-1793026627",
+    "berita-luar-negeri-1793020357",
+    "sports-1792943277",
     "economy-1793073564",
-    "economy-1793073483",
-    "economy-1793071177",
-    "financial-1793069962",
-    "financial-1793069437",
-    "financial-1793069151",
-    "financial-1793068190",
-    "financial-1793068056",
-    "economy-1793049878",
-    "economy-1793049934"
+    "chinese-community-1792942692",
+    "hukum-1792767922",
+    "financial-1793069962"
   ],
   "categories": [
     {
@@ -335,16 +339,16 @@ window.SHANGBAO_DATA = {
     }
   ],
   "popular": [
+    "society-1793022678",
+    "politics-1793023446",
+    "hukum-1792767922",
+    "sports-1792943277",
+    "entertainment-1793026627",
+    "berita-luar-negeri-1793020357",
+    "chinese-community-1792942692",
+    "metropolitan-1793024041",
     "economy-1793073564",
-    "economy-1793073483",
-    "economy-1793071177",
-    "financial-1793069962",
-    "financial-1793069437",
-    "financial-1793069151",
-    "financial-1793068190",
-    "financial-1793068056",
-    "economy-1793049878",
-    "economy-1793049934"
+    "kesehatan-1792744525"
   ],
   "articles": [
     {
