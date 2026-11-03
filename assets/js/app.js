@@ -148,35 +148,35 @@
   const SIDEBAR_SLIDES = [
     {
       src: 'assets/images/sidebar/Infrastruktur relationship.jpg',
-      badge: '国际视点',
+      badge: '专题视点',
       title: '印新两国外长举行闭门会晤',
-      sub: '针对核心敏感议题进行深入对表',
+      sub: '针对核心敏感议题深入对表',
       href: '#category/国外新闻',
       isExternal: false
     },
     {
-      src: 'assets/images/sidebar/Bank of china.jpg',
-      badge: '金融服务',
-      title: '中国银行 · 银联非接借记卡',
-      sub: '畅享中国便捷支付体验，跨境商旅轻松结算',
-      href: 'https://www.bankofchina.co.id/en-id/home.html',
-      isExternal: true
-    },
-    {
-      src: 'assets/images/sidebar/TheArtOfTea.jpg',
-      badge: '生活文化',
-      title: '63 Teh Enam Tiga · The Art of Tea',
-      sub: '传承自然茶道韵味，品味高山茶叶精粹',
-      href: '#brand/the-art-of-tea',
+      src: 'assets/images/articles/Plane.jpg',
+      badge: '特别行动',
+      title: '空军开展人工降雨作业',
+      sub: '调集运输机与专业设备加速灭火',
+      href: '#category/社会',
       isExternal: false
     },
     {
-      src: 'assets/images/sidebar/ICBC.jpg',
-      badge: '企业金融',
-      title: '中国工商银行印尼分行',
-      sub: '助力中印尼经贸投资合作全面发展',
-      href: 'https://www.icbc.co.id/',
-      isExternal: true
+      src: 'assets/images/articles/Forek Hulu Migas.jpg',
+      badge: '能源政经',
+      title: '推进上游油气投资峰会',
+      sub: '多方签署合作协议保障能源发展',
+      href: '#category/政治',
+      isExternal: false
+    },
+    {
+      src: 'assets/images/articles/Air plane.jpg',
+      badge: '交通民生',
+      title: '交通部拟调降航季机票价格',
+      sub: '优化运力配置便利节假日出行',
+      href: '#category/财经',
+      isExternal: false
     }
   ];
 
@@ -190,11 +190,15 @@
     const container = $('#sidebarCarousel');
     if (!track || !container) return;
 
-    // Render slides
+    // Render slides with proper accessibility attributes and eager load for the first slide
     track.innerHTML = SIDEBAR_SLIDES.map((s, i) => `
-      <div class="sidebar-slide ${i === 0 ? 'active' : ''}" data-sidebar-slide="${i}">
-        <a href="${esc(s.href)}" class="sidebar-slide-link" ${s.isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''}>
-          <img src="${esc(s.src)}" alt="${esc(s.title)}" class="sidebar-slide-img" loading="lazy">
+      <div class="sidebar-slide ${i === 0 ? 'active' : ''}" data-sidebar-slide="${i}"
+        role="group" aria-roledescription="slide" aria-label="第 ${i + 1} 条，共 ${SIDEBAR_SLIDES.length} 条"
+        aria-hidden="${i === 0 ? 'false' : 'true'}">
+        <a href="${esc(s.href)}" class="sidebar-slide-link" tabindex="${i === 0 ? '0' : '-1'}"
+          ${s.isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+          <img src="${esc(s.src)}" alt="${esc(s.title)}" class="sidebar-slide-img"
+            loading="${i === 0 ? 'eager' : 'lazy'}" width="360" height="225">
           <div class="sidebar-slide-caption">
             <span class="sidebar-slide-badge">${esc(s.badge)}</span>
             <h4 class="sidebar-slide-title">${esc(s.title)}</h4>
@@ -204,10 +208,12 @@
       </div>
     `).join('');
 
-    // Render dot indicators
+    // Render dot indicators with ARIA tab roles
     if (dotsWrap) {
       dotsWrap.innerHTML = SIDEBAR_SLIDES.map((_, i) => `
-        <button type="button" class="sidebar-carousel-dot ${i === 0 ? 'active' : ''}" data-sb-dot="${i}" aria-label="第 ${i + 1} 张轮播图"></button>
+        <button type="button" class="sidebar-carousel-dot ${i === 0 ? 'active' : ''}"
+          role="tab" data-sb-dot="${i}" aria-label="第 ${i + 1} 张轮播图"
+          aria-selected="${i === 0 ? 'true' : 'false'}" tabindex="${i === 0 ? '0' : '-1'}"></button>
       `).join('');
     }
 
@@ -215,9 +221,20 @@
       const slides = $$('.sidebar-slide', track);
       if (!slides.length) return;
       sbSlideIndex = (idx + slides.length) % slides.length;
-      slides.forEach((sl, i) => sl.classList.toggle('active', i === sbSlideIndex));
+      slides.forEach((sl, i) => {
+        const isActive = (i === sbSlideIndex);
+        sl.classList.toggle('active', isActive);
+        sl.setAttribute('aria-hidden', String(!isActive));
+        const link = sl.querySelector('a');
+        if (link) link.setAttribute('tabindex', isActive ? '0' : '-1');
+      });
       if (dotsWrap) {
-        $$('.sidebar-carousel-dot', dotsWrap).forEach((dot, i) => dot.classList.toggle('active', i === sbSlideIndex));
+        $$('.sidebar-carousel-dot', dotsWrap).forEach((dot, i) => {
+          const isActive = (i === sbSlideIndex);
+          dot.classList.toggle('active', isActive);
+          dot.setAttribute('aria-selected', String(isActive));
+          dot.setAttribute('tabindex', isActive ? '0' : '-1');
+        });
       }
       if (counter) {
         counter.textContent = `${sbSlideIndex + 1} / ${slides.length}`;
@@ -229,6 +246,7 @@
       stopAuto();
       const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReduced) return;
+      if (document.hidden) return;
       sbTimer = setInterval(() => {
         setSbSlide(sbSlideIndex + 1);
       }, 5000);
@@ -258,11 +276,29 @@
     }
 
     // Pause on hover
-    container.onmouseenter = stopAuto;
-    container.onmouseleave = startAuto;
+    container.addEventListener('mouseenter', stopAuto);
+    container.addEventListener('mouseleave', startAuto);
 
-    // Keyboard navigation
-    container.onkeydown = e => {
+    // Pause on keyboard focus
+    container.addEventListener('focusin', stopAuto);
+    container.addEventListener('focusout', e => {
+      if (!container.contains(e.relatedTarget)) {
+        startAuto();
+      }
+    });
+
+    // Pause on document hidden / resume on visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopAuto();
+      } else {
+        startAuto();
+      }
+    });
+
+    // Keyboard navigation (ArrowLeft / ArrowRight)
+    container.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
         setSbSlide(sbSlideIndex - 1);
@@ -272,7 +308,7 @@
         setSbSlide(sbSlideIndex + 1);
         startAuto();
       }
-    };
+    });
 
     // Initial counter and start
     if (counter) counter.textContent = `1 / ${SIDEBAR_SLIDES.length}`;
