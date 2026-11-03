@@ -142,6 +142,171 @@
     }
   }
 
+  /* ----------------------------------------------------------------
+     SIDEBAR AUTOMATIC IMAGE CAROUSEL
+     ---------------------------------------------------------------- */
+  const SIDEBAR_SLIDES = [
+    {
+      src: 'assets/images/sidebar/Infrastruktur relationship.jpg',
+      badge: '国际视点',
+      title: '印新两国外长举行闭门会晤',
+      sub: '针对核心敏感议题进行深入对表',
+      href: '#category/国外新闻',
+      isExternal: false
+    },
+    {
+      src: 'assets/images/sidebar/Bank of china.jpg',
+      badge: '金融服务',
+      title: '中国银行 · 银联非接借记卡',
+      sub: '畅享中国便捷支付体验，跨境商旅轻松结算',
+      href: 'https://www.bankofchina.co.id/en-id/home.html',
+      isExternal: true
+    },
+    {
+      src: 'assets/images/sidebar/TheArtOfTea.jpg',
+      badge: '生活文化',
+      title: '63 Teh Enam Tiga · The Art of Tea',
+      sub: '传承自然茶道韵味，品味高山茶叶精粹',
+      href: '#brand/the-art-of-tea',
+      isExternal: false
+    },
+    {
+      src: 'assets/images/sidebar/ICBC.jpg',
+      badge: '企业金融',
+      title: '中国工商银行印尼分行',
+      sub: '助力中印尼经贸投资合作全面发展',
+      href: 'https://www.icbc.co.id/',
+      isExternal: true
+    }
+  ];
+
+  let sbSlideIndex = 0;
+  let sbTimer = null;
+
+  function initSidebarCarousel() {
+    const track = $('#sidebarCarouselTrack');
+    const dotsWrap = $('#sidebarCarouselDots');
+    const counter = $('#sidebarCarouselCounter');
+    const container = $('#sidebarCarousel');
+    if (!track || !container) return;
+
+    // Render slides
+    track.innerHTML = SIDEBAR_SLIDES.map((s, i) => `
+      <div class="sidebar-slide ${i === 0 ? 'active' : ''}" data-sidebar-slide="${i}">
+        <a href="${esc(s.href)}" class="sidebar-slide-link" ${s.isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+          <img src="${esc(s.src)}" alt="${esc(s.title)}" class="sidebar-slide-img" loading="lazy">
+          <div class="sidebar-slide-caption">
+            <span class="sidebar-slide-badge">${esc(s.badge)}</span>
+            <h4 class="sidebar-slide-title">${esc(s.title)}</h4>
+            <p class="sidebar-slide-sub">${esc(s.sub)}</p>
+          </div>
+        </a>
+      </div>
+    `).join('');
+
+    // Render dot indicators
+    if (dotsWrap) {
+      dotsWrap.innerHTML = SIDEBAR_SLIDES.map((_, i) => `
+        <button type="button" class="sidebar-carousel-dot ${i === 0 ? 'active' : ''}" data-sb-dot="${i}" aria-label="第 ${i + 1} 张轮播图"></button>
+      `).join('');
+    }
+
+    function setSbSlide(idx) {
+      const slides = $$('.sidebar-slide', track);
+      if (!slides.length) return;
+      sbSlideIndex = (idx + slides.length) % slides.length;
+      slides.forEach((sl, i) => sl.classList.toggle('active', i === sbSlideIndex));
+      if (dotsWrap) {
+        $$('.sidebar-carousel-dot', dotsWrap).forEach((dot, i) => dot.classList.toggle('active', i === sbSlideIndex));
+      }
+      if (counter) {
+        counter.textContent = `${sbSlideIndex + 1} / ${slides.length}`;
+      }
+    }
+
+    // Auto-advance timer (5 seconds)
+    function startAuto() {
+      stopAuto();
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+      sbTimer = setInterval(() => {
+        setSbSlide(sbSlideIndex + 1);
+      }, 5000);
+    }
+
+    function stopAuto() {
+      if (sbTimer) {
+        clearInterval(sbTimer);
+        sbTimer = null;
+      }
+    }
+
+    // Event listeners
+    const prevBtn = $('#sbCarouselPrev');
+    const nextBtn = $('#sbCarouselNext');
+    if (prevBtn) prevBtn.onclick = () => { setSbSlide(sbSlideIndex - 1); startAuto(); };
+    if (nextBtn) nextBtn.onclick = () => { setSbSlide(sbSlideIndex + 1); startAuto(); };
+
+    if (dotsWrap) {
+      dotsWrap.onclick = e => {
+        const btn = e.target.closest('[data-sb-dot]');
+        if (btn) {
+          setSbSlide(Number(btn.dataset.sbDot));
+          startAuto();
+        }
+      };
+    }
+
+    // Pause on hover
+    container.onmouseenter = stopAuto;
+    container.onmouseleave = startAuto;
+
+    // Keyboard navigation
+    container.onkeydown = e => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setSbSlide(sbSlideIndex - 1);
+        startAuto();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setSbSlide(sbSlideIndex + 1);
+        startAuto();
+      }
+    };
+
+    // Initial counter and start
+    if (counter) counter.textContent = `1 / ${SIDEBAR_SLIDES.length}`;
+    startAuto();
+  }
+
+  /* ----------------------------------------------------------------
+     SIDEBAR ADDITIONAL EDITORIAL NEWS
+     ---------------------------------------------------------------- */
+  function renderSidebarEditorialNews() {
+    const container = $('#sidebarEditorialNews');
+    if (!container) return;
+    const newsIds = [
+      'economy-1793073483',          // Gold antara.jpg
+      'economy-1793071177',          // Air plane.jpg
+      'financial-1793069437',        // Corporate human.jpg / Moneyfestation
+      'politics-1792920849',         // Forek Hulu Migas.jpg
+      'metropolitan-1792942444'       // Suhut.jpg
+    ];
+    const items = newsIds.map(id => byId.get(id)).filter(Boolean);
+    container.innerHTML = items.map(a => `
+      <article class="sidebar-editorial-card">
+        <div class="sidebar-editorial-thumb">
+          ${scene(a, 'sidebar-editorial-scene')}
+        </div>
+        <div class="sidebar-editorial-info">
+          <span class="sidebar-editorial-cat">${esc(a.category)}</span>
+          <h4 class="sidebar-editorial-title">${articleLink(a)}</h4>
+          <div class="sidebar-editorial-meta">⏱ ${esc(sourceDate(a))}</div>
+        </div>
+      </article>
+    `).join('');
+  }
+
   function cardList(ids) { return ids.map(id => byId.get(id)).filter(Boolean); }
 
   // 12 Prominent Lead Categories (strongest editorial coverage & photos)
@@ -288,7 +453,7 @@
     navLinks.forEach(link => link.classList.toggle('active', (hash === '#home' && !link.dataset.navLabel) || (hash === '#home' && link.textContent.trim() === '')));
   }
 
-  renderNav(); renderTicker(); renderHero(); renderPopular(); renderCategories(); startClock();
+  renderNav(); renderTicker(); renderHero(); renderPopular(); renderCategories(); initSidebarCarousel(); renderSidebarEditorialNews(); startClock();
 
   $('#prevSlide').addEventListener('click', () => setSlide(slideIndex - 1));
   $('#nextSlide').addEventListener('click', () => setSlide(slideIndex + 1));

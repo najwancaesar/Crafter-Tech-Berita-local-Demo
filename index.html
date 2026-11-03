@@ -140,8 +140,8 @@
         <!-- SIDEBAR (approx 25.5%, persistent alongside main column) -->
         <aside class="sidebar" id="sidebar" aria-label="推荐新闻与侧边专栏">
 
-          <!-- Widget: Popular News -->
-          <section class="widget">
+          <!-- 1. Widget: Popular News -->
+          <section class="widget widget-popular" aria-label="新闻排行">
             <div class="widget-title">
               <button type="button" class="widget-tab active" id="tabPopular">热文推荐</button>
               <button type="button" class="widget-tab-sub" id="tabMostRead">最多阅读者</button>
@@ -149,7 +149,7 @@
             <ol class="popular-list" id="popularList"></ol>
           </section>
 
-          <!-- Widget: Market Rates / Finance Banner -->
+          <!-- 2. Widget: Market Rates / Finance Banner -->
           <div class="widget-market-promo" aria-label="市场行情">
             <a href="#category/财经" class="sidebar-banner-link" aria-label="查看财经市场行情">
               <img src="assets/images/sidebar/finance.jpg" alt="市场行情看板" class="sidebar-market-img"
@@ -157,22 +157,151 @@
             </a>
           </div>
 
-          <!-- Widget: E-Paper Promotional Banner -->
+          <!-- 3. Widget: E-Paper Promotional Banner -->
           <div class="widget-epaper-promo" aria-label="印尼商报电子报">
             <a href="#epaper" class="sidebar-banner-link" aria-label="阅读印尼商报电子报">
               <img src="assets/images/sidebar/e-paper2.jpg" alt="印尼商报电子报 (E-Paper)" class="sidebar-epaper-img">
             </a>
           </div>
 
-          <!-- Widget: Side Highlights / Today's News -->
-          <section class="widget side-promo">
+          <!-- 4. Widget: Automatic Image Carousel (热点专栏精选) -->
+          <section class="widget sidebar-carousel-widget" aria-roledescription="carousel" aria-label="热点专栏轮播">
             <div class="widget-title">
-              <span class="widget-tab active">今日要闻</span>
+              <span class="widget-tab active">热点专栏</span>
+              <span class="carousel-counter" id="sidebarCarouselCounter">1 / 4</span>
             </div>
-            <div id="sideHighlights"></div>
+            <div class="sidebar-carousel" id="sidebarCarousel" tabindex="0" aria-label="精选专栏轮播图" aria-live="polite">
+              <div class="sidebar-carousel-track" id="sidebarCarouselTrack"></div>
+              <div class="sidebar-carousel-controls">
+                <button type="button" class="sidebar-carousel-btn prev" id="sbCarouselPrev" aria-label="上一张">‹</button>
+                <button type="button" class="sidebar-carousel-btn next" id="sbCarouselNext" aria-label="下一张">›</button>
+              </div>
+              <div class="sidebar-carousel-dots" id="sidebarCarouselDots" role="tablist" aria-label="轮播导航点"></div>
+            </div>
           </section>
 
-          <!-- Widget: Sidebar Advertisement Placement -->
+          <!-- 5. Widget: Field Feature (资源与工业观察 - Field.jpg) -->
+          <section class="widget widget-feature-field" aria-label="资源与工业视点">
+            <div class="widget-title">
+              <span class="widget-tab active">资源与工业</span>
+              <span class="widget-tag-pill">实地观察</span>
+            </div>
+            <article class="field-feature-card">
+              <div class="field-feature-media">
+                <img src="assets/images/sidebar/Field.jpg" alt="露天矿区作业与沉淀水体设施航拍" class="field-feature-img" loading="lazy">
+                <span class="field-media-badge">实地俯瞰</span>
+              </div>
+              <div class="field-feature-body">
+                <h3 class="field-feature-title">矿区作业与生态治理观察</h3>
+                <p class="field-feature-text">
+                  航拍俯瞰大型露天矿区作业现场，重型工程运输车辆穿梭于分层开采作业面。矿区依山势布局阶梯状沉淀池与尾水处理系统，在稳步推进资源开采的同时严密实施水土保持与环境监测。现代化矿业实践注重绿色生态修复与合规管理，持续推动产业开采与环境保护协调发展。
+                </p>
+                <div class="field-feature-footer">
+                  <span class="feature-tag">综合视点</span>
+                  <a href="#category/财经" class="feature-link">了解更多资讯 »</a>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <!-- 6. Widget: Moneyfold Feature (货币流通与多币种结算观察 - Moneyfold.jpg) -->
+          <section class="widget widget-feature-moneyfold" aria-label="货币与金融透视">
+            <div class="widget-title">
+              <span class="widget-tab active">金融微观察</span>
+              <span class="widget-tag-pill">汇市动态</span>
+            </div>
+            <article class="moneyfold-feature-card">
+              <div class="moneyfold-feature-media">
+                <img src="assets/images/sidebar/Moneyfold.jpg" alt="银行柜台印尼盾现钞与美元纸币" class="moneyfold-feature-img" loading="lazy">
+                <span class="moneyfold-badge">多币种</span>
+              </div>
+              <div class="moneyfold-feature-body">
+                <h3 class="moneyfold-feature-title">现金流通与多币种结算动态</h3>
+                <p class="moneyfold-feature-text">
+                  银行柜台现场展示印尼盾大额纸币与美元现钞的清点与结算流转，呈现日常商贸活动的活跃脉动。在深化双边本币结算（LCT）机制背景下，本地商业往来与外币兑换需求保持稳健运行。金融机构依托多币种便利服务，持续为跨国商旅与民间经贸提供坚实支撑。
+                </p>
+                <div class="moneyfold-feature-footer">
+                  <span class="feature-tag">货币与汇市</span>
+                  <a href="#category/金融" class="feature-link">查看财经专栏 »</a>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <!-- 7. Widget: Financial and Corporate Image Section -->
+          <section class="widget widget-corporate-section" aria-label="企业与合作伙伴专栏">
+            <div class="widget-title">
+              <span class="widget-tab active">企业与机构专栏</span>
+            </div>
+            <div class="corporate-items-grid">
+              <!-- Item 1: Bank of China UnionPay Promotion -->
+              <div class="corporate-item corporate-item-boc">
+                <a href="https://www.bankofchina.co.id/en-id/home.html" target="_blank" rel="noopener noreferrer" class="corporate-item-link" aria-label="访问中国银行印尼分行官网">
+                  <div class="corporate-item-media">
+                    <img src="assets/images/sidebar/Bank of china.jpg" alt="中国银行银联非接借记卡宣传海报" class="corporate-item-img" loading="lazy">
+                  </div>
+                  <div class="corporate-item-caption">
+                    <span class="corp-tag">金融合作伙伴</span>
+                    <h4 class="corporate-item-title">中国银行 · 银联便捷支付体验</h4>
+                    <p class="corporate-item-desc">使用银联非接借记卡，畅享便捷支付与跨境结算服务</p>
+                  </div>
+                </a>
+              </div>
+
+              <!-- Item 2: ICBC Indonesia Corporate Banner -->
+              <div class="corporate-item corporate-item-icbc">
+                <a href="https://www.icbc.co.id/" target="_blank" rel="noopener noreferrer" class="corporate-item-link" aria-label="访问中国工商银行印尼分行官网">
+                  <div class="corporate-item-media icbc-media">
+                    <img src="assets/images/sidebar/ICBC.jpg" alt="中国工商银行印尼分行徽标" class="corporate-item-img icbc-img" loading="lazy">
+                  </div>
+                  <div class="corporate-item-caption">
+                    <span class="corp-tag">金融机构</span>
+                    <h4 class="corporate-item-title">中国工商银行印尼分行 (ICBC)</h4>
+                    <p class="corporate-item-desc">提供全方位企业金融与零售银行业务，搭建中印尼经贸桥梁</p>
+                  </div>
+                </a>
+              </div>
+
+              <!-- Item 3: Mediterania TCM Clinic -->
+              <div class="corporate-item corporate-item-mediterania">
+                <a href="#clinic/mediterania" class="corporate-item-link" aria-label="永才中医中药馆服务介绍">
+                  <div class="corporate-item-media">
+                    <img src="assets/images/sidebar/Mediterania.jpg" alt="永才中医中药馆特色康复中心宣传海报" class="corporate-item-img" loading="lazy">
+                  </div>
+                  <div class="corporate-item-caption">
+                    <span class="corp-tag">社区健康</span>
+                    <h4 class="corporate-item-title">永才中医中药馆 · 特式康复中心</h4>
+                    <p class="corporate-item-desc">传统中医药、针灸推拿与气功调理 · 电话: 0812-2678-9209</p>
+                  </div>
+                </a>
+              </div>
+
+              <!-- Item 4: The Art of Tea -->
+              <div class="corporate-item corporate-item-tea">
+                <a href="#brand/the-art-of-tea" class="corporate-item-link" aria-label="63 Teh Enam Tiga 茶艺介绍">
+                  <div class="corporate-item-media tea-media">
+                    <img src="assets/images/sidebar/TheArtOfTea.jpg" alt="63 Teh Enam Tiga The Art of Tea 标识" class="corporate-item-img tea-img" loading="lazy">
+                  </div>
+                  <div class="corporate-item-caption">
+                    <span class="corp-tag">生活文化</span>
+                    <h4 class="corporate-item-title">63 Teh Enam Tiga · The Art of Tea</h4>
+                    <p class="corporate-item-desc">严选高品质天然茶叶，弘扬东方茶道精萃与健康生活</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <!-- 8. Widget: Additional Editorial News (精选要闻) -->
+          <section class="widget widget-sidebar-editorial" aria-label="精选推荐要闻">
+            <div class="widget-title">
+              <span class="widget-tab active">今日要闻</span>
+              <a href="#category/财经" class="widget-title-more" aria-label="查看更多财经新闻">更多 »</a>
+            </div>
+            <div class="sidebar-editorial-list" id="sidebarEditorialNews"></div>
+          </section>
+
+          <!-- 9. Widget: Sidebar Advertisement Placement -->
           <div class="widget-ad-slot" aria-label="侧边推广">
             <a href="#ads" class="sidebar-ad-link" aria-label="印尼商报推广合作">
               <img src="assets/images/banners/head-ad-banner.svg" alt="印尼商报广告与推广合作" class="sidebar-ad-img">
