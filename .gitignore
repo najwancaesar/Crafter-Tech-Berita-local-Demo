@@ -3,4 +3,6 @@ reference/
 node_modules/
 package-lock.json
 screenshots/
+config/translation.php
+scratch/
 

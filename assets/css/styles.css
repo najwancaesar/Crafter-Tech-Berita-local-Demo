@@ -229,31 +229,65 @@ img { display: block; max-width: 100%; }
   flex-shrink: 0;
 }
 
-/* Language selector box — yellow */
-.lang-box {
+/* Language selector — functional dropdown (replaces display-only lang-box) */
+.lang-selector {
+  position: relative;
+  flex-shrink: 0;
+}
+.lang-btn {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 211px;
+  gap: 6px;
+  min-width: 120px;
+  width: auto;
   background: var(--yellow-lang);
   color: #111;
   font-size: 11px;
   font-weight: bold;
-  letter-spacing: 1px;
-  padding: 0 16px;
+  letter-spacing: 0.5px;
+  padding: 0 14px;
   height: 42px;
   cursor: pointer;
   white-space: nowrap;
   user-select: none;
+  border: 0;
+  font-family: inherit;
 }
-.lang-box .lang-divider {
-  color: rgba(0,0,0,0.25);
-  font-weight: normal;
+.lang-btn:hover,
+.lang-btn:focus-visible { background: #e5bf00; outline: 2px solid #c9a800; outline-offset: -2px; }
+.lang-current { flex: 1; text-align: left; }
+.lang-arrow { font-size: 9px; color: #555; transition: transform 0.15s; }
+.lang-btn[aria-expanded="true"] .lang-arrow { transform: rotate(180deg); }
+
+.lang-dropdown {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 2px);
+  min-width: 160px;
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  z-index: 99;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
 }
-.lang-box .lang-arrow {
-  font-size: 9px;
-  color: #555;
+.lang-dropdown[hidden] { display: none; }
+.lang-option {
+  display: block;
+  width: 100%;
+  padding: 9px 16px;
+  background: none;
+  border: 0;
+  text-align: left;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  color: #222;
 }
+.lang-option:hover,
+.lang-option:focus-visible { background: #f5f5f5; outline: none; }
+.lang-option.active { background: #fef7cc; font-weight: bold; color: #a07800; }
 
 /* Search button — blue */
 .search-btn {
@@ -306,6 +340,17 @@ img { display: block; max-width: 100%; }
   font-size: 18px;
   padding: 1px 10px;
 }
+.search-panel .search-clear {
+  background: #f0f0f0;
+  color: #555;
+  border: 0;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+}
+.search-panel .search-clear:hover { background: #e0e0e0; }
+.search-panel .search-clear[hidden] { display: none; }
 
 /* ================================================================
    MASTHEAD — Logo + Slogan + App Badges + Weather
@@ -522,6 +567,69 @@ img { display: block; max-width: 100%; }
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+/* ================================================================
+   TRANSLATION STATUS BAR
+   ================================================================ */
+.translation-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid #ddd;
+  transition: all 0.25s ease;
+  z-index: 5;
+}
+.translation-status-bar[hidden] { display: none; }
+.translation-status-bar.status-translating {
+  background: #f0f6ff;
+  border-bottom-color: #c8ddf8;
+  color: #1a5099;
+}
+.translation-status-bar.status-complete {
+  background: #f1f9f1;
+  border-bottom-color: #cce7cc;
+  color: #1e5c22;
+}
+.translation-status-bar.status-error {
+  background: #fff3f3;
+  border-bottom-color: #f8c8c8;
+  color: #b31b1b;
+}
+.translation-status-bar .status-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.translation-status-bar .status-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+}
+.status-retry-btn {
+  background: var(--red);
+  color: #fff;
+  border: 0;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.status-retry-btn:hover { background: #b00025; }
+.status-retry-btn[hidden] { display: none; }
+.status-close-btn {
+  background: none;
+  border: 0;
+  color: #777;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.status-close-btn:hover { color: #222; }
 
 /* ================================================================
    MAIN CONTENT
@@ -1596,11 +1704,11 @@ button.widget-tab-sub.active {
   border: 1px solid var(--line);
   background: #fafafa;
 }
-.search-results h2 {
-  margin: 0 0 12px;
-  border-bottom: 2px solid var(--red);
-  padding-bottom: 8px;
-}
+.search-results-header { margin-bottom: 14px; border-bottom: 2px solid var(--red); padding-bottom: 8px; }
+.search-results h2 { margin: 0; font-size: 16px; }
+.search-results h2 em { font-style: normal; color: var(--red); }
+.search-result-count { font-size: 12px; font-weight: normal; color: #777; margin-left: 8px; }
+.search-empty, .search-no-results { color: #888; padding: 16px 0; font-size: 14px; }
 .result-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1615,6 +1723,18 @@ button.widget-tab-sub.active {
 }
 .result-card .news-scene { width: 110px; flex-shrink: 0; }
 .result-card h3 { font-size: 14px; margin: 0 0 6px; line-height: 1.4; }
+.search-load-more-wrap { text-align: center; margin-top: 16px; }
+.search-load-more {
+  background: var(--red);
+  color: #fff;
+  border: 0;
+  padding: 9px 24px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  border-radius: 2px;
+}
+.search-load-more:hover { background: #c0002a; }
 
 /* ================================================================
    ARTICLE VIEW
@@ -1631,6 +1751,67 @@ button.widget-tab-sub.active {
   margin: 20px 0;
 }
 .article-view .source-link { color: var(--blue-link); text-decoration: underline; }
+
+/* Article translation bar */
+.article-translate-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 20px 0 8px;
+  padding: 10px 14px;
+  background: #f0f6ff;
+  border: 1px solid #c8ddf8;
+  border-radius: 4px;
+}
+.btn-translate,
+.btn-view-original {
+  background: var(--blue-search);
+  color: #fff;
+  border: 0;
+  padding: 7px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.btn-translate:hover  { background: #3275e0; }
+.btn-translate:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-view-original { background: #555; }
+.btn-view-original:hover { background: #333; }
+.translation-badge {
+  display: inline-block;
+  background: #e8f0fe;
+  color: #3b73d8;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.3px;
+}
+.translation-provider { font-size: 11px; color: #888; }
+.translate-status {
+  font-size: 13px;
+  padding: 8px 14px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+.translate-status.translating { background: #f0f6ff; color: #3b73d8; }
+.translate-status.error { background: #fff0f0; color: #c0002a; border: 1px solid #f8c8c8; }
+.btn-retry {
+  display: inline-block;
+  margin-left: 10px;
+  background: var(--red);
+  color: #fff;
+  border: 0;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  border-radius: 2px;
+}
+
 
 /* ================================================================
    EMPTY STATE
@@ -1782,7 +1963,7 @@ button.widget-tab-sub.active {
   /* Secondary nav */
   .nav-secondary-wrap { min-height: 38px; }
   .site-nav.nav-secondary-sub { display: none; }
-  .lang-box { font-size: 10.5px; padding: 0 10px; height: 38px; }
+  .lang-btn { font-size: 10.5px; padding: 0 10px; height: 38px; min-width: 90px; }
   .search-btn { width: 42px; height: 38px; }
 
   /* Search panel */

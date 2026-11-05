@@ -12,10 +12,34 @@
   const IMG = window.SHANGBAO_IMAGES || {};
   const POOL = window.SHANGBAO_IMAGE_POOL || [];
 
-  /**
-   * Determine initial candidate image source for an article.
-   * Priority: (1) manual map in SHANGBAO_IMAGES (2) deterministic pool (3) verified default local photo
-   */
+  // i18n & translation helpers
+  const i18n = window.SHANGBAO_I18N;
+  const t = (key, params) => i18n ? i18n.t(key, params) : key;
+
+  function getLocalized(a) {
+    if (window.SHANGBAO_TRANSLATE) {
+      return window.SHANGBAO_TRANSLATE.getLocalizedArticle(a);
+    }
+    return a;
+  }
+
+  function getCategoryName(categoryName) {
+    if (window.SHANGBAO_TRANSLATE) {
+      return window.SHANGBAO_TRANSLATE.getLocalizedCategory(categoryName);
+    }
+    return categoryName;
+  }
+
+  function getNavLabel(rawLabel) {
+    if (!i18n) return rawLabel;
+    const key = `nav_${rawLabel}`;
+    const trans = i18n.t(key);
+    return (trans && trans !== key) ? trans : rawLabel;
+  }
+
+  /* ----------------------------------------------------------------
+     IMAGE HELPERS
+  ---------------------------------------------------------------- */
   function getCandidateSrc(a) {
     const map = window.SHANGBAO_IMAGES || IMG;
     if (a && a.id && map[a.id]) return map[a.id];
@@ -39,51 +63,64 @@
     </div>`;
   }
 
-  function articleLink(a, cls='') { return `<a class="${cls}" href="${articleHref(a)}" data-article-id="${esc(a.id)}">${esc(a.title)}</a>`; }
+  function articleLink(a, cls='') {
+    const la = getLocalized(a);
+    return `<a class="${cls}" href="${articleHref(a)}" data-article-id="${esc(a.id)}">${esc(la.title)}</a>`;
+  }
 
+  /* ----------------------------------------------------------------
+     NAVIGATION
+  ---------------------------------------------------------------- */
   function renderNav() {
     const navPrimary = $('#siteNav');
     const navSub     = $('#siteNavSub');
     const all = data.navigation.length ? data.navigation : [{label:'首页',path:''}];
-    // First item is home; items 1..16 go to primary row (total 17 items: home + 16 categories)
-    // Remaining 5 categories go to secondary row with language + search tools.
     const PRIMARY_MAX = 17;
-    const primary = all.slice(0, PRIMARY_MAX);
+    const primary   = all.slice(0, PRIMARY_MAX);
     const secondary = all.slice(PRIMARY_MAX);
 
-    navPrimary.innerHTML = primary.map((n, i) =>
-      `<a class="nav-link ${i===0?'home active':''}" href="${n.path ? `#category/${encodeURIComponent(n.label)}` : '#home'}" data-nav-label="${esc(n.label)}">${i===0?'<svg class="home-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>':esc(n.label)}</a>`
-    ).join('');
+    navPrimary.innerHTML = primary.map((n, i) => {
+      const dispLabel = getNavLabel(n.label);
+      return `<a class="nav-link ${i===0?'home active':''}" href="${n.path ? `#category/${encodeURIComponent(n.label)}` : '#home'}" data-nav-label="${esc(n.label)}">${i===0?'<svg class="home-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>':esc(dispLabel)}</a>`;
+    }).join('');
 
     if (navSub) {
-      navSub.innerHTML = secondary.map(n =>
-        `<a class="nav-link-sub" href="#category/${encodeURIComponent(n.label)}" data-nav-label="${esc(n.label)}">${esc(n.label)}</a>`
-      ).join('');
+      navSub.innerHTML = secondary.map(n => {
+        const dispLabel = getNavLabel(n.label);
+        return `<a class="nav-link-sub" href="#category/${encodeURIComponent(n.label)}" data-nav-label="${esc(n.label)}">${esc(dispLabel)}</a>`;
+      }).join('');
     }
   }
 
-  // Live clock for weather display
+  // Live clock
   function startClock() {
     const el = document.getElementById('weatherTime');
     if (!el) return;
     function tick() {
       const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      const s = String(now.getSeconds()).padStart(2, '0');
-      el.textContent = `${h}:${m}:${s}`;
+      el.textContent = [now.getHours(), now.getMinutes(), now.getSeconds()]
+        .map(n => String(n).padStart(2, '0')).join(':');
     }
     tick();
     setInterval(tick, 1000);
   }
 
+  /* ----------------------------------------------------------------
+     TICKER
+  ---------------------------------------------------------------- */
   function renderTicker() {
     const stories = data.ticker.map(id => byId.get(id)).filter(Boolean);
     const items = (stories.length ? stories : data.articles.slice(0, 5));
-    const oneSet = items.map(a => `<a href="${articleHref(a)}" data-article-id="${esc(a.id)}"><b>【${esc(a.category)}】</b> ${esc(a.title)}</a>`).join('');
+    const oneSet = items.map(a => {
+      const la = getLocalized(a);
+      return `<a href="${articleHref(a)}" data-article-id="${esc(a.id)}"><b>【${esc(la.category)}】</b> ${esc(la.title)}</a>`;
+    }).join('');
     $('#tickerTrack').innerHTML = oneSet + oneSet;
   }
 
+  /* ----------------------------------------------------------------
+     HERO CAROUSEL
+  ---------------------------------------------------------------- */
   let slideIndex = 0;
   function renderHero() {
     const slides = data.features.map(id => byId.get(id)).filter(Boolean).slice(0, 10);
@@ -116,6 +153,9 @@
     $$('#carouselDots button').forEach((dot, i) => dot.classList.toggle('active', i === slideIndex));
   }
 
+  /* ----------------------------------------------------------------
+     POPULAR / SIDEBAR
+  ---------------------------------------------------------------- */
   function renderPopular(isMostRead = false) {
     const listEl = $('#popularList');
     if (!listEl) return;
@@ -124,14 +164,11 @@
     const list = stories.length ? stories : data.articles.slice(offset, offset + 5);
     listEl.innerHTML = list.map((a, i) =>
       `<li><span class="popular-num">${String(i + 1).padStart(2, '0')}</span>${articleLink(a)}</li>`
-    ).join('') || '<li>暂无推荐新闻</li>';
+    ).join('') || `<li>${t('noPopular')}</li>`;
 
-    // Selected News / Highlights: 4 short news entries with non-repeating photos
     const highlightIds = [
-      'politics-1792679463',          // President moment.jpg
-      'metropolitan-1792764926',      // Train.jpg
-      'chinese-community-1792771116', // Speech.jpg
-      'editorial-1793022053'          // Sir purbaya.jpg
+      'politics-1792679463', 'metropolitan-1792764926',
+      'chinese-community-1792771116', 'editorial-1793022053'
     ];
     const quick = highlightIds.map(id => byId.get(id)).filter(Boolean);
     const sideHighlights = $('#sideHighlights');
@@ -143,54 +180,25 @@
   }
 
   /* ----------------------------------------------------------------
-     SIDEBAR AUTOMATIC IMAGE CAROUSEL
-     ---------------------------------------------------------------- */
+     SIDEBAR CAROUSEL
+  ---------------------------------------------------------------- */
   const SIDEBAR_SLIDES = [
-    {
-      src: 'assets/images/sidebar/Infrastruktur relationship.jpg',
-      badge: '专题视点',
-      title: '印新两国外长举行闭门会晤',
-      sub: '针对核心敏感议题深入对表',
-      href: '#category/国外新闻',
-      isExternal: false
-    },
-    {
-      src: 'assets/images/articles/Plane.jpg',
-      badge: '特别行动',
-      title: '空军开展人工降雨作业',
-      sub: '调集运输机与专业设备加速灭火',
-      href: '#category/社会',
-      isExternal: false
-    },
-    {
-      src: 'assets/images/articles/Forek Hulu Migas.jpg',
-      badge: '能源政经',
-      title: '推进上游油气投资峰会',
-      sub: '多方签署合作协议保障能源发展',
-      href: '#category/政治',
-      isExternal: false
-    },
-    {
-      src: 'assets/images/articles/Air plane.jpg',
-      badge: '交通民生',
-      title: '交通部拟调降航季机票价格',
-      sub: '优化运力配置便利节假日出行',
-      href: '#category/财经',
-      isExternal: false
-    }
+    { src: 'assets/images/sidebar/Infrastruktur relationship.jpg', badge: '专题视点', title: '印新两国外长举行闭门会晤', sub: '针对核心敏感议题深入对表', href: '#category/国外新闻', isExternal: false },
+    { src: 'assets/images/articles/Plane.jpg', badge: '特别行动', title: '空军开展人工降雨作业', sub: '调集运输机与专业设备加速灭火', href: '#category/社会', isExternal: false },
+    { src: 'assets/images/articles/Forek Hulu Migas.jpg', badge: '能源政经', title: '推进上游油气投资峰会', sub: '多方签署合作协议保障能源发展', href: '#category/政治', isExternal: false },
+    { src: 'assets/images/articles/Air plane.jpg', badge: '交通民生', title: '交通部拟调降航季机票价格', sub: '优化运力配置便利节假日出行', href: '#category/财经', isExternal: false }
   ];
 
   let sbSlideIndex = 0;
   let sbTimer = null;
 
   function initSidebarCarousel() {
-    const track = $('#sidebarCarouselTrack');
-    const dotsWrap = $('#sidebarCarouselDots');
-    const counter = $('#sidebarCarouselCounter');
+    const track     = $('#sidebarCarouselTrack');
+    const dotsWrap  = $('#sidebarCarouselDots');
+    const counter   = $('#sidebarCarouselCounter');
     const container = $('#sidebarCarousel');
     if (!track || !container) return;
 
-    // Render slides with proper accessibility attributes and eager load for the first slide
     track.innerHTML = SIDEBAR_SLIDES.map((s, i) => `
       <div class="sidebar-slide ${i === 0 ? 'active' : ''}" data-sidebar-slide="${i}"
         role="group" aria-roledescription="slide" aria-label="第 ${i + 1} 条，共 ${SIDEBAR_SLIDES.length} 条"
@@ -208,7 +216,6 @@
       </div>
     `).join('');
 
-    // Render dot indicators with ARIA tab roles
     if (dotsWrap) {
       dotsWrap.innerHTML = SIDEBAR_SLIDES.map((_, i) => `
         <button type="button" class="sidebar-carousel-dot ${i === 0 ? 'active' : ''}"
@@ -236,30 +243,19 @@
           dot.setAttribute('tabindex', isActive ? '0' : '-1');
         });
       }
-      if (counter) {
-        counter.textContent = `${sbSlideIndex + 1} / ${slides.length}`;
-      }
+      if (counter) counter.textContent = `${sbSlideIndex + 1} / ${SIDEBAR_SLIDES.length}`;
     }
 
-    // Auto-advance timer (5 seconds)
     function startAuto() {
       stopAuto();
-      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReduced) return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       if (document.hidden) return;
-      sbTimer = setInterval(() => {
-        setSbSlide(sbSlideIndex + 1);
-      }, 5000);
+      sbTimer = setInterval(() => setSbSlide(sbSlideIndex + 1), 5000);
     }
-
     function stopAuto() {
-      if (sbTimer) {
-        clearInterval(sbTimer);
-        sbTimer = null;
-      }
+      if (sbTimer) { clearInterval(sbTimer); sbTimer = null; }
     }
 
-    // Event listeners
     const prevBtn = $('#sbCarouselPrev');
     const nextBtn = $('#sbCarouselNext');
     if (prevBtn) prevBtn.onclick = () => { setSbSlide(sbSlideIndex - 1); startAuto(); };
@@ -268,121 +264,88 @@
     if (dotsWrap) {
       dotsWrap.onclick = e => {
         const btn = e.target.closest('[data-sb-dot]');
-        if (btn) {
-          setSbSlide(Number(btn.dataset.sbDot));
-          startAuto();
-        }
+        if (btn) { setSbSlide(Number(btn.dataset.sbDot)); startAuto(); }
       };
     }
 
-    // Pause on hover
     container.addEventListener('mouseenter', stopAuto);
     container.addEventListener('mouseleave', startAuto);
-
-    // Pause on keyboard focus
     container.addEventListener('focusin', stopAuto);
     container.addEventListener('focusout', e => {
-      if (!container.contains(e.relatedTarget)) {
-        startAuto();
-      }
+      if (!container.contains(e.relatedTarget)) startAuto();
     });
-
-    // Pause on document hidden / resume on visible
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        stopAuto();
-      } else {
-        startAuto();
-      }
+      document.hidden ? stopAuto() : startAuto();
     });
-
-    // Keyboard navigation (ArrowLeft / ArrowRight)
     container.addEventListener('keydown', e => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        setSbSlide(sbSlideIndex - 1);
-        startAuto();
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        setSbSlide(sbSlideIndex + 1);
-        startAuto();
-      }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); setSbSlide(sbSlideIndex - 1); startAuto(); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); setSbSlide(sbSlideIndex + 1); startAuto(); }
     });
 
-    // Initial counter and start
     if (counter) counter.textContent = `1 / ${SIDEBAR_SLIDES.length}`;
     startAuto();
   }
 
   /* ----------------------------------------------------------------
-     SIDEBAR ADDITIONAL EDITORIAL NEWS
-     ---------------------------------------------------------------- */
+     SIDEBAR EDITORIAL NEWS
+  ---------------------------------------------------------------- */
   function renderSidebarEditorialNews() {
     const container = $('#sidebarEditorialNews');
     if (!container) return;
     const newsIds = [
-      'economy-1793073483',          // Gold antara.jpg
-      'economy-1793071177',          // Air plane.jpg
-      'financial-1793069437',        // Corporate human.jpg / Moneyfestation
-      'politics-1792920849',         // Forek Hulu Migas.jpg
-      'metropolitan-1792942444'       // Suhut.jpg
+      'economy-1793073483', 'economy-1793071177',
+      'financial-1793069437', 'politics-1792920849',
+      'metropolitan-1792942444'
     ];
     const items = newsIds.map(id => byId.get(id)).filter(Boolean);
-    container.innerHTML = items.map(a => `
-      <article class="sidebar-editorial-card">
-        <div class="sidebar-editorial-thumb">
-          ${scene(a, 'sidebar-editorial-scene')}
-        </div>
-        <div class="sidebar-editorial-info">
-          <span class="sidebar-editorial-cat">${esc(a.category)}</span>
-          <h4 class="sidebar-editorial-title">${articleLink(a)}</h4>
-          <div class="sidebar-editorial-meta">⏱ ${esc(sourceDate(a))}</div>
-        </div>
-      </article>
-    `).join('');
+    container.innerHTML = items.map(a => {
+      const la = getLocalized(a);
+      return `
+        <article class="sidebar-editorial-card">
+          <div class="sidebar-editorial-thumb">${scene(a, 'sidebar-editorial-scene')}</div>
+          <div class="sidebar-editorial-info">
+            <span class="sidebar-editorial-cat">${esc(la.category)}</span>
+            <h4 class="sidebar-editorial-title">${articleLink(a)}</h4>
+            <div class="sidebar-editorial-meta">⏱ ${esc(sourceDate(a))}</div>
+          </div>
+        </article>
+      `;
+    }).join('');
   }
 
+  /* ----------------------------------------------------------------
+     CATEGORY FEED
+  ---------------------------------------------------------------- */
   function cardList(ids) { return ids.map(id => byId.get(id)).filter(Boolean); }
 
-  // 12 Prominent Lead Categories (strongest editorial coverage & photos)
   const FEATURED_CATEGORIES = new Set([
-    '热点新闻',
-    '政治',
-    '法律',
-    '首都动态',
-    '国外新闻',
-    '教育与文化',
-    '华社',
-    '社论',
-    '社会',
-    '特别',
-    '财经',
-    '金融'
+    '热点新闻','政治','法律','首都动态','国外新闻','教育与文化',
+    '华社','社论','社会','特别','财经','金融'
   ]);
 
   function renderCategorySection(category) {
     const stories = cardList(category.articles);
     if (!stories.length) return '';
-
-    // Check if this category is one of the 12 Featured Lead categories
     const isFeatured = FEATURED_CATEGORIES.has(category.name);
+    const catTitle = getCategoryName(category.name);
+    const readMoreLabel = t('readMore');
 
     if (isFeatured) {
-      // 12 Featured Categories: 1 prominent lead article with large landscape photo + 2x2 supporting grid
       const [lead, ...rest] = stories;
+      const leadLocal = getLocalized(lead);
       return `<section class="category-section category-featured" data-category="${esc(category.name)}">
         <div class="category-heading">
-          <h2>${esc(category.name)}</h2>
-          <a href="#category/${encodeURIComponent(category.name)}" data-category-link="${esc(category.name)}">查看更多 »</a>
+          <h2>${esc(catTitle)}</h2>
+          <a href="#category/${encodeURIComponent(category.name)}" data-category-link="${esc(category.name)}">${readMoreLabel}</a>
         </div>
         <article class="lead-story">
           ${scene(lead)}
           <div class="story-copy">
             <h3>${articleLink(lead)}</h3>
             <div class="meta">⏱ ${esc(sourceDate(lead))}</div>
-            <p>${esc(lead.excerpt || '此页面快照未包含完整文章正文。')}</p>
-            <a class="read-more" href="${articleHref(lead)}" data-article-id="${esc(lead.id)}">查看更多 »</a>
+            <p>${esc(leadLocal.excerpt || t('noExcerpt'))}</p>
+            <a class="read-more" href="${articleHref(lead)}" data-article-id="${esc(lead.id)}">${readMoreLabel}</a>
           </div>
         </article>
         ${rest.length ? `<div class="story-grid">${rest.slice(0, 4).map(a =>
@@ -390,11 +353,10 @@
         ).join('')}</div>` : ''}
       </section>`;
     } else {
-      // 8 Compact Categories: Compact layout with smaller thumbnails, headlines, publication dates, and category link
       return `<section class="category-section category-compact" data-category="${esc(category.name)}">
         <div class="category-heading">
-          <h2>${esc(category.name)}</h2>
-          <a href="#category/${encodeURIComponent(category.name)}" data-category-link="${esc(category.name)}">查看更多 »</a>
+          <h2>${esc(catTitle)}</h2>
+          <a href="#category/${encodeURIComponent(category.name)}" data-category-link="${esc(category.name)}">${readMoreLabel}</a>
         </div>
         <div class="compact-grid">
           ${stories.map(a =>
@@ -416,104 +378,549 @@
     let cats = data.categories;
     if (filterName) cats = cats.filter(c => c.name === filterName);
     if (!cats.length) {
-      feed.innerHTML = `<div class="empty-state">没有找到「${esc(filterName)}」分类。 <a href="#home">返回首页</a></div>`;
+      feed.innerHTML = `<div class="empty-state">没有找到「${esc(filterName)}」分类。 <a href="#home">${esc(t('backHome'))}</a></div>`;
       return;
     }
     feed.innerHTML = cats.map(renderCategorySection).join('');
   }
 
-  function renderSearch(query) {
+  /* ================================================================
+     SEARCH — refined with state preservation, count, clear, Escape
+  ================================================================ */
+
+  let _prevHash = '#home';
+  const SEARCH_PAGE_SIZE = 20;
+  let _searchQuery = '';
+  let _searchPage  = 0;
+  let _searchAllResults = [];
+
+  function _hideAllViews() {
+    const hero = $('#heroArea');
+    const ad   = $('.ad-placeholder');
+    if (hero) hero.hidden = true;
+    if (ad)   ad.hidden   = true;
+    $('#categoryFeed').hidden  = true;
+    $('#articleView').hidden   = true;
+    $('#searchResults').hidden = true;
+  }
+
+  function openSearch() {
+    if ($('#searchResults').hidden !== false) {
+      _prevHash = location.hash || '#home';
+    }
+    _hideAllViews();
+    $('#searchResults').hidden = false;
+    const panel = $('#searchPanel');
+    panel.hidden = false;
+    $('#searchToggle').setAttribute('aria-expanded', 'true');
+    const input = $('#searchInput');
+    input.focus();
+    if (!input.value.trim()) {
+      renderSearch('');
+    } else {
+      renderSearch(input.value);
+    }
+  }
+
+  function closeSearch() {
+    $('#searchPanel').hidden = true;
+    $('#searchToggle').setAttribute('aria-expanded', 'false');
+    $('#searchInput').value = '';
+    $('#searchResults').hidden = true;
+    $('#searchResults').innerHTML = '';
+    _searchQuery = '';
+    _searchPage  = 0;
+    _searchAllResults = [];
+    _updateClearBtn();
+    const restoreHash = _prevHash || '#home';
+    if (location.hash !== restoreHash) {
+      location.hash = restoreHash;
+    } else {
+      route();
+    }
+  }
+
+  function _updateClearBtn() {
+    const clearBtn = $('#searchClear');
+    if (clearBtn) clearBtn.hidden = !$('#searchInput').value;
+  }
+
+  function renderSearch(query, page) {
     const q = text(query).toLocaleLowerCase();
     const box = $('#searchResults');
-    const hero = $('#heroArea');
-    if (!q) {
+
+    if (!q || !q.replace(/\s/g, '')) {
       box.hidden = true;
-      box.innerHTML = '';
-      if (hero) hero.hidden = false;
-      $('#categoryFeed').hidden = false;
+      box.innerHTML = `<p class="search-empty">${t('searchEmpty')}</p>`;
+      box.hidden = false;
+      _hideAllViews();
+      box.hidden = false;
       return;
     }
-    const results = data.articles.filter(a => `${a.title} ${a.category} ${a.excerpt}`.toLocaleLowerCase().includes(q)).slice(0, 40);
+
+    _searchQuery = query;
+    _searchPage  = page ?? 0;
+
+    // Multilingual Search: match against localized fields as primary, Chinese as fallback
+    const locale = i18n ? i18n.getLocale() : 'zh-CN';
+    _searchAllResults = data.articles.filter(a => {
+      const la = getLocalized(a);
+      // 1. Search current localized fields
+      const locText = `${la.title} ${la.category} ${la.excerpt}`.toLocaleLowerCase();
+      if (locText.includes(q)) return true;
+
+      // 2. If viewing in English/Indonesian, also match original Chinese text as fallback
+      if (locale !== 'zh-CN') {
+        const zhText = `${a.title} ${a.category} ${a.excerpt}`.toLocaleLowerCase();
+        if (zhText.includes(q)) return true;
+      }
+      return false;
+    });
+
+    const total  = _searchAllResults.length;
+    const start  = _searchPage * SEARCH_PAGE_SIZE;
+    const shown  = _searchAllResults.slice(start, start + SEARCH_PAGE_SIZE);
+    const visibleCount = start + shown.length;
+
+    _hideAllViews();
     box.hidden = false;
-    if (hero) hero.hidden = true;
-    $('#categoryFeed').hidden = true;
-    box.innerHTML = `<h2>搜索结果：${esc(query)} <small>（${results.length} 条）</small></h2>${results.length ? `<div class="result-list">${results.map(a => `<article class="result-card">${scene(a)}<div><h3>${articleLink(a)}</h3><div class="meta">${esc(a.category)} · ${esc(sourceDate(a))}</div><p>${esc(a.excerpt||'首页快照未包含正文。')}</p></div></article>`).join('')}</div>` : '<p>没有找到匹配的新闻标题或摘要。</p>'}`;
+
+    const countLabel = total <= SEARCH_PAGE_SIZE
+      ? t('searchResultsCount', { total })
+      : t('searchResultsShowing', { shown: visibleCount, total });
+
+    box.innerHTML = `
+      <div class="search-results-header">
+        <h2>${t('searchResultsHeading')}<em>${esc(query)}</em>
+          <small class="search-result-count">${esc(countLabel)}</small>
+        </h2>
+      </div>
+      ${shown.length
+        ? `<div class="result-list">${shown.map(a => {
+            const la = getLocalized(a);
+            return `<article class="result-card">
+              ${scene(a)}
+              <div>
+                <h3><a href="${articleHref(a)}" data-article-id="${esc(a.id)}">${esc(la.title)}</a></h3>
+                <div class="meta">${esc(la.category)} · ${esc(sourceDate(a))}</div>
+                <p>${esc(la.excerpt || t('noExcerpt'))}</p>
+              </div>
+            </article>`;
+          }).join('')}</div>`
+        : `<p class="search-no-results">${t('searchNoResults')}</p>`
+      }
+      ${visibleCount < total
+        ? `<div class="search-load-more-wrap">
+            <button type="button" class="search-load-more" id="searchLoadMore"
+              data-page="${_searchPage + 1}">
+              ${t('searchLoadMore')} (${total - visibleCount})
+            </button>
+          </div>`
+        : ''
+      }
+    `;
   }
+
+  /* ================================================================
+     ARTICLE VIEW — with translation UI
+  ================================================================ */
 
   function openArticle(id) {
     const a = byId.get(id);
     if (!a) return;
-    const hero = $('#heroArea');
-    if (hero) hero.hidden = true;
+
+    _hideAllViews();
     const ad = $('.ad-placeholder');
-    if (ad) ad.hidden = true;
-    $('#categoryFeed').hidden = true;
-    $('#searchResults').hidden = true;
+    if (ad) ad.hidden = false;
     $('#articleView').hidden = false;
-    $('#articleView').innerHTML = `<a class="back-link" href="#home">← 返回首页</a><article><div class="meta">${esc(a.category)} · ${esc(sourceDate(a))}</div><h1>${esc(a.title)}</h1>${scene(a)}<p class="article-lead">${esc(a.excerpt || '此页面快照未包含这篇文章的完整正文。')}</p><div class="article-note">说明：提供的 HTML 是首页快照，并没有完整新闻正文。这里展示的是可用于重建 UI 的本地文章预览，而非原文全文。</div><p><a class="source-link" href="${esc(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">在 Shangbao 原网站打开这篇文章 ↗</a></p></article>`;
-    document.title = `${a.title} - Shangbao Indonesia | Reconstruction`;
+
+    const locale = i18n ? i18n.getLocale() : 'zh-CN';
+    const needsTranslation = (locale !== 'zh-CN');
+    const la = getLocalized(a);
+
+    const translateBtnLabel  = t('translateArticle');
+    const viewOriginalLabel  = t('viewOriginal');
+    const backLabel          = t('backHome');
+    const noteLabel          = t('articleNote');
+    const openOriginalLabel  = t('openOriginal');
+
+    const isTranslated = la.isTranslated;
+
+    $('#articleView').innerHTML = `
+      <a class="back-link" href="${esc(_prevHash || '#home')}" id="articleBackBtn">${esc(backLabel)}</a>
+      <article id="articleContent">
+        <div class="meta">${esc(la.category)} · ${esc(sourceDate(a))}</div>
+        <h1 id="articleTitle">${esc(la.title)}</h1>
+        ${scene(a)}
+        <p class="article-lead" id="articleExcerpt">${esc(la.excerpt || t('noExcerpt'))}</p>
+        <div class="article-note">${esc(noteLabel)}</div>
+        ${needsTranslation ? `
+          <div class="article-translate-bar" id="translateBar" data-article-id="${esc(a.id)}">
+            ${isTranslated
+              ? `<button type="button" class="btn-view-original" id="btnViewOriginal">${esc(viewOriginalLabel)}</button>
+                 <span class="translation-badge">${esc(t('translationLabel'))}</span>
+                 <span class="translation-provider">${esc(t('translationBy'))}</span>`
+              : `<button type="button" class="btn-translate" id="btnTranslate">${esc(translateBtnLabel)}</button>`
+            }
+          </div>
+          <div id="translateStatus" class="translate-status" hidden></div>
+        ` : ''}
+        <p><a class="source-link" href="${esc(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(openOriginalLabel)}</a></p>
+      </article>
+    `;
+
+    // Wire up back button
+    const backBtn = $('#articleBackBtn');
+    if (backBtn) {
+      backBtn.addEventListener('click', e => {
+        e.preventDefault();
+        const dest = _prevHash || '#home';
+        if (location.hash !== dest) location.hash = dest;
+        else route();
+      });
+    }
+
+    // Wire translate & view original buttons
+    _wireTranslateBtn(a, locale);
+
+    document.title = `${la.title} - Shangbao Indonesia | Reconstruction`;
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
+  function _wireTranslateBtn(a, locale) {
+    const btnT = $('#btnTranslate');
+    const btnO = $('#btnViewOriginal');
+    const statusEl = $('#translateStatus');
+
+    if (btnT) {
+      btnT.addEventListener('click', async () => {
+        await _doTranslate(a, locale, statusEl);
+      });
+    }
+    if (btnO) {
+      btnO.addEventListener('click', () => _restoreOriginal(a));
+    }
+  }
+
+  function _applyTranslation(translated, a) {
+    const titleEl   = $('#articleTitle');
+    const excerptEl = $('#articleExcerpt');
+    const barEl     = $('#translateBar');
+    if (titleEl && translated.title)     titleEl.textContent   = translated.title;
+    if (excerptEl && translated.excerpt) excerptEl.textContent = translated.excerpt;
+    if (barEl) {
+      if (a && a.id) barEl.dataset.articleId = a.id;
+      barEl.innerHTML = `
+        <button type="button" class="btn-view-original" id="btnViewOriginal">${esc(t('viewOriginal'))}</button>
+        <span class="translation-badge">${esc(t('translationLabel'))}</span>
+        <span class="translation-provider">${esc(t('translationBy'))}</span>
+      `;
+      const btnO = $('#btnViewOriginal');
+      if (btnO) {
+        btnO.addEventListener('click', () => {
+          const targetArticle = a || (barEl.dataset.articleId ? byId.get(barEl.dataset.articleId) : null);
+          if (targetArticle) _restoreOriginal(targetArticle);
+        });
+      }
+    }
+  }
+
+  function _restoreOriginal(a) {
+    const titleEl   = $('#articleTitle');
+    const excerptEl = $('#articleExcerpt');
+    const barEl     = $('#translateBar');
+    if (titleEl)   titleEl.textContent   = a.title;
+    if (excerptEl) excerptEl.textContent = a.excerpt || t('noExcerpt');
+    if (barEl) {
+      barEl.dataset.articleId = a.id;
+      barEl.innerHTML = `<button type="button" class="btn-translate" id="btnTranslate">${esc(t('translateArticle'))}</button>`;
+      const locale = i18n ? i18n.getLocale() : 'en';
+      _wireTranslateBtn(a, locale);
+    }
+  }
+
+  async function _doTranslate(a, locale, statusEl) {
+    const btnT = $('#btnTranslate');
+    if (btnT) { btnT.disabled = true; btnT.textContent = t('translating'); }
+    if (statusEl) { statusEl.hidden = false; statusEl.textContent = t('translating'); statusEl.className = 'translate-status translating'; }
+
+    try {
+      if (!window.SHANGBAO_TRANSLATE) {
+        throw { code: 'TRANSLATION_FAILED', message: 'Translation engine not loaded.' };
+      }
+      const res = await window.SHANGBAO_TRANSLATE.translateSingleArticle(a, locale);
+      _applyTranslation(res, a);
+      if (statusEl) statusEl.hidden = true;
+    } catch (err) {
+      const errCode = err.code || 'TRANSLATION_FAILED';
+      const errMsg = i18n ? i18n.tError(errCode) : (err.message || '翻译失败，请稍后再试。');
+
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.className = 'translate-status error';
+        statusEl.innerHTML = `${esc(errMsg)} <button type="button" class="btn-retry" id="btnRetry">${esc(t('err_retry'))}</button>`;
+        const retryBtn = $('#btnRetry');
+        if (retryBtn) retryBtn.addEventListener('click', () => _doTranslate(a, locale, statusEl));
+      }
+
+      if (btnT) { btnT.disabled = false; btnT.textContent = t('translateArticle'); }
+    }
+  }
+
+  /* ================================================================
+     HOME VIEW
+  ================================================================ */
   function showHome() {
     const hero = $('#heroArea');
     if (hero) hero.hidden = false;
     const ad = $('.ad-placeholder');
     if (ad) ad.hidden = false;
-    $('#articleView').hidden = true;
-    $('#categoryFeed').hidden = false;
+    $('#articleView').hidden   = true;
+    $('#categoryFeed').hidden  = false;
     $('#searchResults').hidden = true;
     renderCategories();
-    document.title = '首页 - Shangbao Indonesia | Reconstruction';
+    document.title = `${t('home')} - Shangbao Indonesia | Reconstruction`;
   }
 
+  /* ================================================================
+     HASH ROUTER
+  ================================================================ */
   function route() {
     const hash = decodeURIComponent(location.hash || '#home');
-    if (hash.startsWith('#article/')) { openArticle(decodeURIComponent(hash.slice('#article/'.length))); return; }
+
+    if (hash.startsWith('#article/')) {
+      openArticle(decodeURIComponent(hash.slice('#article/'.length)));
+      return;
+    }
     if (hash.startsWith('#category/')) {
       const cat = hash.slice('#category/'.length);
       const hero = $('#heroArea');
       if (hero) hero.hidden = true;
       const ad = $('.ad-placeholder');
       if (ad) ad.hidden = false;
-      $('#articleView').hidden = true;
+      $('#articleView').hidden   = true;
       $('#searchResults').hidden = true;
-      $('#categoryFeed').hidden = false;
+      $('#categoryFeed').hidden  = false;
       renderCategories(cat);
-      document.title = `${cat} - Shangbao Indonesia | Reconstruction`;
+      const dispCat = getCategoryName(cat);
+      document.title = `${dispCat} - Shangbao Indonesia | Reconstruction`;
       window.scrollTo({top: 0, behavior: 'smooth'});
       return;
     }
     showHome();
-    const navLinks = $$('.nav-link');
-    navLinks.forEach(link => link.classList.toggle('active', (hash === '#home' && !link.dataset.navLabel) || (hash === '#home' && link.textContent.trim() === '')));
+    $$('.nav-link').forEach(link =>
+      link.classList.toggle('active', (hash === '#home' && !link.dataset.navLabel) || (hash === '#home' && link.textContent.trim() === ''))
+    );
   }
 
-  renderNav(); renderTicker(); renderHero(); renderPopular(); renderCategories(); initSidebarCarousel(); renderSidebarEditorialNews(); startClock();
+  /* ================================================================
+     REFRESH ACTIVE CONTENT
+  ================================================================ */
+  function refreshActiveContent() {
+    renderNav();
+    renderTicker();
+    renderHero();
+    renderPopular();
+    renderSidebarEditorialNews();
 
+    const catFeed = $('#categoryFeed');
+    if (catFeed && !catFeed.hidden) {
+      const currentHash = decodeURIComponent(location.hash || '#home');
+      if (currentHash.startsWith('#category/')) {
+        renderCategories(currentHash.slice('#category/'.length));
+      } else {
+        renderCategories();
+      }
+    }
+
+    if (!$('#searchResults').hidden && _searchQuery) {
+      renderSearch(_searchQuery, _searchPage);
+    }
+
+    if (!$('#articleView').hidden) {
+      const hash = decodeURIComponent(location.hash || '');
+      if (hash.startsWith('#article/')) {
+        openArticle(decodeURIComponent(hash.slice('#article/'.length)));
+      }
+    }
+  }
+
+  /* ================================================================
+     LANGUAGE SELECTOR
+  ================================================================ */
+  function initLangSelector() {
+    const selector  = document.getElementById('langSelector');
+    const btn       = document.getElementById('langBtn');
+    const dropdown  = document.getElementById('langDropdown');
+    if (!selector || !btn || !dropdown) return;
+
+    function openDropdown() {
+      dropdown.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      const activeOpt = dropdown.querySelector('.lang-option.active') || dropdown.querySelector('.lang-option');
+      if (activeOpt) activeOpt.focus();
+    }
+
+    function closeDropdown() {
+      dropdown.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (dropdown.hidden) openDropdown(); else closeDropdown();
+    });
+
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openDropdown();
+      }
+    });
+
+    dropdown.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeDropdown(); btn.focus(); }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const opts = [...dropdown.querySelectorAll('.lang-option')];
+        const idx = opts.indexOf(document.activeElement);
+        if (idx < opts.length - 1) opts[idx + 1].focus();
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const opts = [...dropdown.querySelectorAll('.lang-option')];
+        const idx = opts.indexOf(document.activeElement);
+        if (idx > 0) opts[idx - 1].focus();
+        else { closeDropdown(); btn.focus(); }
+      }
+    });
+
+    dropdown.addEventListener('click', e => {
+      const opt = e.target.closest('[data-locale]');
+      if (!opt) return;
+      const locale = opt.dataset.locale;
+      closeDropdown();
+      btn.focus();
+      if (i18n) i18n.setLocale(locale);
+    });
+
+    document.addEventListener('click', e => {
+      if (!selector.contains(e.target)) closeDropdown();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !dropdown.hidden) { closeDropdown(); btn.focus(); }
+    });
+
+    if (i18n) {
+      const stored = i18n.getLocale();
+      const labels = { 'zh-CN': '中文', 'en': 'English', 'id': 'Indonesia' };
+      const currentSpan = btn.querySelector('.lang-current');
+      if (currentSpan) currentSpan.textContent = labels[stored] || '中文';
+      dropdown.querySelectorAll('[data-locale]').forEach(opt => {
+        const isActive = opt.dataset.locale === stored;
+        opt.setAttribute('aria-selected', String(isActive));
+        opt.classList.toggle('active', isActive);
+      });
+    }
+  }
+
+  /* ================================================================
+     LOCALE CHANGE HANDLER
+  ================================================================ */
+  document.addEventListener('shangbao:localechange', e => {
+    const locale = (e && e.detail && e.detail.locale) || (i18n ? i18n.getLocale() : 'zh-CN');
+
+    if (i18n) i18n.applyAll();
+
+    // Re-render UI immediately using available cached / fallback data
+    refreshActiveContent();
+
+    // Trigger page-wide batch translation
+    if (window.SHANGBAO_TRANSLATE) {
+      if (locale !== 'zh-CN') {
+        window.SHANGBAO_TRANSLATE.translateAllArticles(locale).catch(err => {
+          console.warn('[SHANGBAO] Batch translation completed with notice:', err);
+        });
+      } else {
+        window.SHANGBAO_TRANSLATE.updateStatusUI('hide');
+      }
+    }
+  });
+
+  // Listen for incremental chunk translations and completion
+  document.addEventListener('shangbao:content-chunk-loaded', refreshActiveContent);
+  document.addEventListener('shangbao:content-translated', refreshActiveContent);
+
+  /* ================================================================
+     INIT — wire up all event listeners
+  ================================================================ */
+  renderNav();
+  renderTicker();
+  renderHero();
+  renderPopular();
+  renderCategories();
+  initSidebarCarousel();
+  renderSidebarEditorialNews();
+  startClock();
+
+  // Hero carousel controls
   $('#prevSlide').addEventListener('click', () => setSlide(slideIndex - 1));
   $('#nextSlide').addEventListener('click', () => setSlide(slideIndex + 1));
-  $('#carouselDots').addEventListener('click', e => { const b = e.target.closest('[data-dot]'); if (b) setSlide(Number(b.dataset.dot)); });
+  $('#carouselDots').addEventListener('click', e => {
+    const b = e.target.closest('[data-dot]');
+    if (b) setSlide(Number(b.dataset.dot));
+  });
 
+  // Search panel toggle
   $('#searchToggle').addEventListener('click', () => {
     const panel = $('#searchPanel');
-    panel.hidden = !panel.hidden;
-    $('#searchToggle').setAttribute('aria-expanded', String(!panel.hidden));
-    if (!panel.hidden) $('#searchInput').focus();
+    if (panel.hidden) {
+      openSearch();
+    } else {
+      closeSearch();
+    }
   });
-  $('#searchClose').addEventListener('click', () => {
-    $('#searchPanel').hidden = true;
-    $('#searchToggle').setAttribute('aria-expanded', 'false');
-    $('#searchInput').value = '';
-    renderSearch('');
-  });
+
+  // Search close button
+  $('#searchClose').addEventListener('click', () => closeSearch());
+
+  // Search clear button
+  const searchClearBtn = $('#searchClear');
+  if (searchClearBtn) {
+    searchClearBtn.addEventListener('click', () => {
+      $('#searchInput').value = '';
+      _updateClearBtn();
+      $('#searchInput').focus();
+      renderSearch('');
+    });
+  }
+
+  // Update clear button visibility as user types
+  $('#searchInput').addEventListener('input', _updateClearBtn);
+
+  // Search form submit
   $('#searchPanel').addEventListener('submit', e => {
     e.preventDefault();
-    renderSearch($('#searchInput').value);
+    renderSearch($('#searchInput').value, 0);
   });
-  $('#searchInput').addEventListener('keydown', e => { if (e.key === 'Escape') $('#searchClose').click(); });
 
-  const tabPop = $('#tabPopular');
+  // Escape key closes search panel
+  $('#searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeSearch();
+  });
+
+  // Load more results
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('#searchLoadMore');
+    if (btn) {
+      const page = Number(btn.dataset.page) || 1;
+      renderSearch(_searchQuery, page);
+    }
+  });
+
+  // Popular tabs
+  const tabPop  = $('#tabPopular');
   const tabMost = $('#tabMostRead');
   if (tabPop && tabMost) {
     tabPop.addEventListener('click', () => {
@@ -528,19 +935,23 @@
     });
   }
 
+  // Mobile menu
   $('#mobileMenu').addEventListener('click', () => {
     const isOpen = $('#siteNav').classList.toggle('open');
     $('#mobileMenu').setAttribute('aria-expanded', String(isOpen));
   });
 
+  // Primary nav home link
   $('#siteNav').addEventListener('click', e => {
     const a = e.target.closest('[data-nav-label]');
     if (a && a.dataset.navLabel === '首页') {
       e.preventDefault();
+      _prevHash = '#home';
       location.hash = '#home';
     }
   });
 
+  // Secondary nav
   const navSubEl = $('#siteNavSub');
   if (navSubEl) {
     navSubEl.addEventListener('click', e => {
@@ -552,6 +963,7 @@
     });
   }
 
+  // Category links within page
   document.addEventListener('click', e => {
     const cat = e.target.closest('[data-category-link]');
     if (cat) {
@@ -560,15 +972,45 @@
     }
   });
 
-  window.addEventListener('hashchange', route);
+  // Hash change
+  window.addEventListener('hashchange', () => {
+    if (!$('#searchResults').hidden) {
+      $('#searchResults').hidden = true;
+      $('#searchResults').innerHTML = '';
+      $('#searchPanel').hidden = true;
+      $('#searchToggle').setAttribute('aria-expanded', 'false');
+      _searchQuery = '';
+    }
+    const newHash = location.hash || '#home';
+    if (!newHash.startsWith('#article/')) {
+      _prevHash = newHash;
+    }
+    route();
+  });
 
+  // Back-to-top
   const topButton = $('#backToTop');
   window.addEventListener('scroll', () => topButton.classList.toggle('visible', window.scrollY > 450), {passive: true});
   topButton.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
 
+  // Hero auto-advance
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     window.setInterval(() => setSlide(slideIndex + 1), 7000);
   }
 
+  // Language selector
+  initLangSelector();
+
+  // Apply i18n to initial DOM
+  if (i18n) i18n.applyAll();
+
+  // Initial route
   route();
+
+  // If initial locale is English or Indonesian, trigger background translation
+  const initLoc = i18n ? i18n.getLocale() : 'zh-CN';
+  if (initLoc !== 'zh-CN' && window.SHANGBAO_TRANSLATE) {
+    window.SHANGBAO_TRANSLATE.translateAllArticles(initLoc).catch(() => {});
+  }
+
 })();
