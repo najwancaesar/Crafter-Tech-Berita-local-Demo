@@ -1,6 +1,6 @@
 /**
  * seed-translations.js — Bundled Seed Translations for Shangbao Indonesia
- * Provides offline high-quality translations for all 91 canonical articles in English and Indonesian.
+ * Provides offline high-quality translations for all canonical articles in English and Indonesian.
  */
 (() => {
   'use strict';
@@ -369,6 +369,41 @@
     "financial-1793068056": {
       "title": "Indonesian Stock Exchange Index Drops 15.13 Points at Tuesday Opening",
       "excerpt": "[Shangbao News] Regarding indonesian stock exchange index drops 15.13 points at tuesday opening, relevant authorities and community leaders have highlighted key initiatives and progress. Indonesian Stock Exchange Index Drops 15.13 Points at Tuesday Opening continues to draw broad attention across Indonesia."
+    },
+    "berita-luar-negeri-1793842820": {
+      "title": "Louvre Museum in France Hosts Special Exhibition to Commemorate 200 Years of Photography",
+      "excerpt": "[China News Service] A special photography exhibition at the Louvre in France opened on the 4th local time, highlighting the museum's unique status in the history and art of photography. The exhibition is an essential part of the French Ministry of Culture's series of activities commemorating the 200th anniversary of photography.",
+      "caption": "On November 4 local time, the Louvre photography exhibition opened in Paris to commemorate the 200th anniversary of photography, highlighting the museum's role in photographic history. (China News Service)",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "[China News Service] A special photography exhibition at the Louvre in France opened on the 4th local time, highlighting the museum's unique status in the history and art of photography. The exhibition is an essential part of the French Ministry of Culture's series of activities commemorating the 200th anniversary of photography."
+        },
+        {
+          "type": "paragraph",
+          "text": "According to reports, the exhibition features around 300 photographic works, encompassing both masterpieces by photography pioneers and exploratory creations by modern photographers. These photographs cover diverse themes including Louvre collections, exhibition halls, visitors, staff, and secluded areas, offering people an entirely new perspective on the museum."
+        },
+        {
+          "type": "paragraph",
+          "text": "A photograph taken in 1839 by French photography pioneer Louis Daguerre depicting the Louvre's Pavillon de Flore and the Seine River is a highlight of the exhibition. It is one of the earliest official photographic records of the Louvre. Daguerre is also recognized as the photographer of the world's first photograph with human figures."
+        },
+        {
+          "type": "paragraph",
+          "text": "The Louvre stated that since the advent of photography, it has witnessed major historical events such as the Paris Commune, two World Wars, and the boom of French tourism and foreign relations during the 'Glorious Thirty' (1945–1975). The Louvre itself underwent significant milestones, including transitioning from a royal palace to a public museum, the wartime relocation of artworks, and the 1980s renovation project, all preserved through rare historic photographs."
+        },
+        {
+          "type": "paragraph",
+          "text": "The most captivating highlight of the exhibition revolves around photographic works of the Mona Lisa. In 1911, the theft of the Mona Lisa from the Louvre sparked global attention and catapulted the painting to worldwide fame. The widespread dissemination of its photographic reproductions made it iconic. It is considered the most photographed artwork in the museum."
+        },
+        {
+          "type": "paragraph",
+          "text": "Furthermore, the exhibits range from ancient daguerreotypes to camera film and smartphone photography, offering visitors a comprehensive journey through the evolution of photography and its enduring impact on the Louvre."
+        },
+        {
+          "type": "paragraph",
+          "text": "The exhibition will run until May 2027."
+        }
+      ]
     }
   },
   "id": {
@@ -735,6 +770,41 @@
     "financial-1793068056": {
       "title": "IHSG Dibuka Melemah 15,13 Poin pada Pembukaan Perdagangan Hari Selasa",
       "excerpt": "[Warta Shangbao] Terkait ihsg dibuka melemah 15,13 poin pada pembukaan perdagangan hari selasa, pihak berwenang dan masyarakat terkait menyampaikan sejumlah perkembangan penting dan langkah strategis. IHSG Dibuka Melemah 15,13 Poin pada Pembukaan Perdagangan Hari Selasa terus menjadi perhatian luas di berbagai kalangan di Indonesia."
+    },
+    "berita-luar-negeri-1793842820": {
+      "title": "Museum Louvre Prancis Gelar Pameran Khusus Peringati 200 Tahun Kelahiran Fotografi",
+      "excerpt": "[China News Service] Pameran fotografi khusus di Museum Louvre, Prancis, resmi dibuka pada tanggal 4 waktu setempat, menyoroti posisi unik museum tersebut dalam sejarah dan seni fotografi. Pameran ini merupakan bagian penting dari rangkaian kegiatan Kementerian Kebudayaan Prancis untuk memperingati 200 tahun kelahiran fotografi.",
+      "caption": "Pada 4 November waktu setempat, pameran fotografi Louvre dibuka di Paris guna memperingati 200 tahun fotografi serta menyoroti posisi unik museum ini. (China News Service)",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "[China News Service] Pameran fotografi khusus di Museum Louvre, Prancis, resmi dibuka pada tanggal 4 waktu setempat, menyoroti posisi unik museum tersebut dalam sejarah dan seni fotografi. Pameran ini merupakan bagian penting dari rangkaian kegiatan Kementerian Kebudayaan Prancis untuk memperingati 200 tahun kelahiran fotografi."
+        },
+        {
+          "type": "paragraph",
+          "text": "Menurut pihak penyelenggara, pameran ini menampilkan sekitar 300 karya fotografi, mencakup mahakarya perintis fotografi hingga kreasi eksploratif fotografer modern. Foto-foto tersebut mengangkat beragam tema mulai dari koleksi karya seni Louvre, ruang pameran, pengunjung, staf, hingga area tersembunyi museum, memberikan sudut pandang baru yang segar bagi publik."
+        },
+        {
+          "type": "paragraph",
+          "text": "Foto karya pionir fotografi Prancis Louis Daguerre pada tahun 1839 yang menampilkan Pavillon de Flore di Louvre dan Sungai Seine menjadi salah satu koleksi terpenting. Ini merupakan salah satu rekaman visual resmi paling awal dari Louvre. Daguerre juga diakui sebagai pengambil foto pertama di dunia yang memuat sosok manusia."
+        },
+        {
+          "type": "paragraph",
+          "text": "Pihak Louvre menyatakan bahwa sejak kelahiran fotografi, museum ini telah menjadi saksi berbagai peristiwa besar sejarah, seperti Komune Paris, dua Perang Dunia, hingga lonjakan pariwisata Prancis selama periode 'Trente Glorieuses' (1945–1975). Museum ini juga mengalami transformasi besar, termasuk peralihan dari istana kerajaan menjadi museum publik, pemindahan karya seni selama perang, serta proyek pemugaran besar pada era 1980-an, yang seluruhnya terdokumentasi dalam foto-foto bersejarah."
+        },
+        {
+          "type": "paragraph",
+          "text": "Salah satu sorotan paling memikat adalah rangkaian karya foto yang berkaitan dengan lukisan tersohor Monalisa. Pada tahun 1911, pencurian Monalisa dari Louvre menyedot perhatian dunia dan melambungkan ketenarannya. Penyebaran luas foto reproduksi lukisan inilah yang menjadikannya ikon abadi. Monalisa tercatat sebagai karya seni yang paling sering difoto di Louvre."
+        },
+        {
+          "type": "paragraph",
+          "text": "Selain itu, materi pameran tidak hanya mencakup teknik cetak perak daguerreotype kuno, tetapi juga film rol kamera hingga foto ponsel pintar, mengajak pengunjung menyelami evolusi teknologi fotografi serta pengaruhnya terhadap Louvre."
+        },
+        {
+          "type": "paragraph",
+          "text": "Pameran ini akan berlangsung hingga bulan Mei 2027."
+        }
+      ]
     }
   }
 };

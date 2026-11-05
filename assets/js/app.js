@@ -522,12 +522,103 @@
   }
 
   /* ================================================================
-     ARTICLE VIEW — with translation UI
+     ARTICLE VIEW — Dynamic Content-Block Architecture & Full Layout
   ================================================================ */
+
+  function renderContentBlocks(articleObj, localizedObj) {
+    const blocks = localizedObj.content || articleObj.content;
+    if (Array.isArray(blocks) && blocks.length > 0) {
+      return `<div class="article-body" id="articleBody">
+        ${blocks.map(block => {
+          if (!block || typeof block !== 'object') return '';
+          switch (block.type) {
+            case 'paragraph':
+              return `<p class="article-paragraph">${esc(block.text || '')}</p>`;
+            case 'heading':
+              return `<h2 class="article-heading">${esc(block.text || '')}</h2>`;
+            case 'subheading':
+              return `<h3 class="article-subheading">${esc(block.text || '')}</h3>`;
+            case 'quote':
+              return `<blockquote class="article-quote"><p>${esc(block.text || '')}</p>${block.cite ? `<cite>— ${esc(block.cite)}</cite>` : ''}</blockquote>`;
+            case 'list': {
+              const items = Array.isArray(block.items) ? block.items : [];
+              return `<ul class="article-list">${items.map(it => `<li>${esc(it)}</li>`).join('')}</ul>`;
+            }
+            case 'table': {
+              const headers = Array.isArray(block.headers) ? block.headers : [];
+              const rows = Array.isArray(block.rows) ? block.rows : [];
+              return `
+                <div class="article-table-wrap table-responsive">
+                  <table class="article-table">
+                    ${headers.length ? `<thead><tr>${headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>` : ''}
+                    <tbody>${rows.map(r => `<tr>${(Array.isArray(r) ? r : []).map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody>
+                  </table>
+                </div>
+              `;
+            }
+            case 'image':
+              return `
+                <figure class="article-inline-figure">
+                  <img src="${esc(block.src || '')}" alt="${esc(block.caption || '')}" loading="lazy">
+                  ${block.caption ? `<figcaption>${esc(block.caption)}</figcaption>` : ''}
+                </figure>
+              `;
+            default:
+              return block.text ? `<p class="article-paragraph">${esc(block.text)}</p>` : '';
+          }
+        }).join('')}
+      </div>`;
+    } else {
+      // Partial content: render authentic lead excerpt & legal attribution box
+      return `<div class="article-body" id="articleBody">
+        <p class="article-lead" id="articleExcerpt">${esc(localizedObj.excerpt || t('noExcerpt'))}</p>
+        <div class="article-excerpt-box">
+          <div class="article-excerpt-header">
+            <span class="notice-icon" aria-hidden="true">ℹ️</span>
+            <span>${esc(t('articleExcerptNoticeTitle'))}</span>
+          </div>
+          <p class="article-excerpt-text">${esc(t('articleExcerptNoticeDesc'))}</p>
+          ${articleObj.sourceUrl ? `
+            <a class="btn-open-original-full" href="${esc(articleObj.sourceUrl)}" target="_blank" rel="noopener noreferrer">
+              ${esc(t('openOriginalOnShangbao'))} ↗
+            </a>
+          ` : ''}
+        </div>
+      </div>`;
+    }
+  }
 
   function openArticle(id) {
     const a = byId.get(id);
-    if (!a) return;
+
+    // 1. Invalid Article ID -> Graceful Not Found State
+    if (!a) {
+      _hideAllViews();
+      const ad = $('.ad-placeholder');
+      if (ad) ad.hidden = false;
+      const articleViewEl = $('#articleView');
+      articleViewEl.hidden = false;
+      articleViewEl.innerHTML = `
+        <div class="article-not-found" role="alert">
+          <div class="article-not-found-icon">⚠️</div>
+          <h2>${esc(t('articleNotFoundTitle'))}</h2>
+          <p>${esc(t('articleNotFoundDesc'))}</p>
+          <a href="${esc(_prevHash || '#home')}" class="btn-back-home" id="notFoundBackBtn">${esc(t('backHome'))}</a>
+        </div>
+      `;
+      const notFoundBack = $('#notFoundBackBtn');
+      if (notFoundBack) {
+        notFoundBack.addEventListener('click', e => {
+          e.preventDefault();
+          const dest = _prevHash || '#home';
+          if (location.hash !== dest) location.hash = dest;
+          else route();
+        });
+      }
+      document.title = `${t('articleNotFoundTitle')} - Shangbao Indonesia`;
+      window.scrollTo({top: 0, behavior: 'smooth'});
+      return;
+    }
 
     _hideAllViews();
     const ad = $('.ad-placeholder');
@@ -537,39 +628,184 @@
     const locale = i18n ? i18n.getLocale() : 'zh-CN';
     const needsTranslation = (locale !== 'zh-CN');
     const la = getLocalized(a);
-
-    const translateBtnLabel  = t('translateArticle');
-    const viewOriginalLabel  = t('viewOriginal');
-    const backLabel          = t('backHome');
-    const noteLabel          = t('articleNote');
-    const openOriginalLabel  = t('openOriginal');
-
     const isTranslated = la.isTranslated;
 
-    $('#articleView').innerHTML = `
-      <a class="back-link" href="${esc(_prevHash || '#home')}" id="articleBackBtn">${esc(backLabel)}</a>
-      <article id="articleContent">
-        <div class="meta">${esc(la.category)} · ${esc(sourceDate(a))}</div>
-        <h1 id="articleTitle">${esc(la.title)}</h1>
-        ${scene(a)}
-        <p class="article-lead" id="articleExcerpt">${esc(la.excerpt || t('noExcerpt'))}</p>
-        <div class="article-note">${esc(noteLabel)}</div>
-        ${needsTranslation ? `
-          <div class="article-translate-bar" id="translateBar" data-article-id="${esc(a.id)}">
-            ${isTranslated
-              ? `<button type="button" class="btn-view-original" id="btnViewOriginal">${esc(viewOriginalLabel)}</button>
-                 <span class="translation-badge">${esc(t('translationLabel'))}</span>
-                 <span class="translation-provider">${esc(t('translationBy'))}</span>`
-              : `<button type="button" class="btn-translate" id="btnTranslate">${esc(translateBtnLabel)}</button>`
-            }
+    // Breadcrumb
+    const breadcrumbHtml = `
+      <nav class="article-breadcrumb" aria-label="Breadcrumb">
+        <a href="#home">${esc(t('articleBreadcrumbHome'))}</a>
+        <span class="sep">›</span>
+        <a href="#category/${encodeURIComponent(a.category)}">${esc(la.category)}</a>
+        <span class="sep">›</span>
+        <span class="current" title="${esc(la.title)}">${esc(la.title)}</span>
+      </nav>
+    `;
+
+    // Metadata Bar
+    const hasViewCount = (a.viewCount !== undefined && a.viewCount !== null);
+    const sourceAgency = a.source || a.author || (a.excerpt && a.excerpt.startsWith('【中新社】') ? '中新社' : '印尼商报');
+    const metaBarHtml = `
+      <div class="article-meta-bar">
+        <div class="meta-left">
+          <a class="meta-tag-category" href="#category/${encodeURIComponent(a.category)}">${esc(la.category)}</a>
+          <span class="article-meta-item"><i class="fa-clock" aria-hidden="true">⏱</i> ${esc(sourceDate(a))}</span>
+          <span class="article-meta-item meta-tag-source">${esc(sourceAgency)}</span>
+        </div>
+        <div class="meta-right">
+          ${hasViewCount ? `
+            <span class="article-meta-item article-views" title="${esc(t('articleViewCount'))}">
+              <svg class="meta-icon eye-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+              </svg>
+              <span>${esc(String(a.viewCount))}</span>
+            </span>
+          ` : ''}
+        </div>
+      </div>
+    `;
+
+    // Featured Media & Caption
+    const candidate = getCandidateSrc(a);
+    const captionText = la.caption || a.caption || '';
+    const mediaHtml = `
+      <div class="article-featured-media">
+        <img class="article-featured-img" src="${esc(candidate)}" alt="${esc(la.title)}"
+          onerror="window.shangbaoHandleImgFallback && window.shangbaoHandleImgFallback(this, '${esc(a.id)}', 0)">
+        ${captionText ? `<p class="article-caption" id="articleCaption">${esc(captionText)}</p>` : ''}
+      </div>
+    `;
+
+    // Translation Bar
+    const translationBarHtml = needsTranslation ? `
+      <div class="article-translate-bar" id="translateBar" data-article-id="${esc(a.id)}">
+        ${isTranslated
+          ? `<button type="button" class="btn-view-original" id="btnViewOriginal">${esc(t('viewOriginal'))}</button>
+             <span class="translation-badge">${esc(t('translationLabel'))}</span>
+             <span class="translation-provider">${esc(t('translationBy'))}</span>`
+          : `<button type="button" class="btn-translate" id="btnTranslate">${esc(t('translateArticle'))}</button>`
+        }
+      </div>
+      <div id="translateStatus" class="translate-status" hidden></div>
+    ` : '';
+
+    // Content Body
+    const contentHtml = renderContentBlocks(a, la);
+
+    // Social Sharing Bar
+    const shareUrl = encodeURIComponent(window.location.href);
+    const shareText = encodeURIComponent(la.title);
+    const shareBarHtml = `
+      <div class="article-share-bar">
+        <span class="share-label">${esc(t('articleShare'))}</span>
+        <a class="share-btn share-btn-fb" href="https://www.facebook.com/sharer/sharer.php?u=${shareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
+          Facebook
+        </a>
+        <a class="share-btn share-btn-tw" href="https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}" target="_blank" rel="noopener noreferrer" aria-label="Share on X">
+          X / Twitter
+        </a>
+        <a class="share-btn share-btn-wa" href="https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">
+          WhatsApp
+        </a>
+        <button type="button" class="share-btn share-btn-copy" id="shareBtnCopy" aria-label="Copy Link">
+          <span id="shareBtnCopyText">📋 复制链接</span>
+        </button>
+      </div>
+    `;
+
+    // Source Attribution Box
+    const sourceBoxHtml = `
+      <div class="article-source-attribution">
+        <div class="source-attr-left">
+          <strong>${esc(t('articleSource'))}：</strong>
+          <span>${esc(sourceAgency)}</span>
+        </div>
+        ${a.sourceUrl ? `
+          <a class="source-link-out" href="${esc(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">
+            ${esc(t('articleOriginalLink'))} ↗
+          </a>
+        ` : `
+          <span class="source-archive-tag">历史档案存档</span>
+        `}
+      </div>
+    `;
+
+    // Navigation (Previous / Next Article)
+    const artIndex = data.articles.findIndex(item => item.id === a.id);
+    const prevArt = artIndex > 0 ? data.articles[artIndex - 1] : null;
+    const nextArt = artIndex < data.articles.length - 1 ? data.articles[artIndex + 1] : null;
+
+    const navPrevNextHtml = `
+      <div class="article-nav-prev-next">
+        ${prevArt ? `
+          <a class="article-nav-card nav-prev" href="${articleHref(prevArt)}">
+            <div class="article-nav-label">← ${esc(t('articlePrev'))}</div>
+            <div class="article-nav-title">${esc(getLocalized(prevArt).title)}</div>
+          </a>
+        ` : `
+          <div class="article-nav-card nav-disabled">
+            <div class="article-nav-label">← ${esc(t('articlePrev'))}</div>
+            <div class="article-nav-title">${esc(t('articleNoMorePrev'))}</div>
           </div>
-          <div id="translateStatus" class="translate-status" hidden></div>
-        ` : ''}
-        <p><a class="source-link" href="${esc(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(openOriginalLabel)}</a></p>
+        `}
+        ${nextArt ? `
+          <a class="article-nav-card nav-next" href="${articleHref(nextArt)}">
+            <div class="article-nav-label">${esc(t('articleNext'))} →</div>
+            <div class="article-nav-title">${esc(getLocalized(nextArt).title)}</div>
+          </a>
+        ` : `
+          <div class="article-nav-card nav-disabled">
+            <div class="article-nav-label">${esc(t('articleNext'))} →</div>
+            <div class="article-nav-title">${esc(t('articleNoMoreNext'))}</div>
+          </div>
+        `}
+      </div>
+    `;
+
+    // Related Articles from same category
+    const relatedList = data.articles
+      .filter(item => item.category === a.category && item.id !== a.id)
+      .slice(0, 4);
+
+    const relatedHtml = relatedList.length ? `
+      <div class="article-related-news">
+        <h3 class="article-related-heading">${esc(t('articleRelatedNews'))}</h3>
+        <div class="related-grid">
+          ${relatedList.map(rel => {
+            const relLocal = getLocalized(rel);
+            const relImg = getCandidateSrc(rel);
+            return `
+              <a class="related-card" href="${articleHref(rel)}">
+                <img class="related-card-img" src="${esc(relImg)}" alt="${esc(relLocal.title)}" loading="lazy"
+                  onerror="window.shangbaoHandleImgFallback && window.shangbaoHandleImgFallback(this, '${esc(rel.id)}', 0)">
+                <div class="related-card-body">
+                  <div class="related-card-meta">${esc(relLocal.category)} · ${esc(sourceDate(rel))}</div>
+                  <div class="related-card-title">${esc(relLocal.title)}</div>
+                </div>
+              </a>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    ` : '';
+
+    // Render entire article layout into #articleView
+    $('#articleView').innerHTML = `
+      <a class="back-link" href="${esc(_prevHash || '#home')}" id="articleBackBtn">← ${esc(t('backHome'))}</a>
+      <article class="single-article-container" id="articleContent">
+        ${breadcrumbHtml}
+        ${metaBarHtml}
+        <h1 class="article-headline" id="articleTitle">${esc(la.title)}</h1>
+        ${mediaHtml}
+        ${translationBarHtml}
+        ${contentHtml}
+        ${shareBarHtml}
+        ${sourceBoxHtml}
+        ${navPrevNextHtml}
+        ${relatedHtml}
       </article>
     `;
 
-    // Wire up back button
+    // Wire Back Button
     const backBtn = $('#articleBackBtn');
     if (backBtn) {
       backBtn.addEventListener('click', e => {
@@ -577,6 +813,23 @@
         const dest = _prevHash || '#home';
         if (location.hash !== dest) location.hash = dest;
         else route();
+      });
+    }
+
+    // Wire Copy Link Button
+    const copyBtn = $('#shareBtnCopy');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(window.location.href).then(() => {
+            const txt = $('#shareBtnCopyText');
+            if (txt) {
+              const orig = txt.textContent;
+              txt.textContent = '✓ ' + (t('articleShareCopied') || '已复制！');
+              setTimeout(() => { txt.textContent = orig; }, 2500);
+            }
+          }).catch(() => {});
+        }
       });
     }
 
@@ -604,10 +857,19 @@
 
   function _applyTranslation(translated, a) {
     const titleEl   = $('#articleTitle');
+    const captionEl = $('#articleCaption');
     const excerptEl = $('#articleExcerpt');
+    const bodyEl    = $('#articleBody');
     const barEl     = $('#translateBar');
+
     if (titleEl && translated.title)     titleEl.textContent   = translated.title;
+    if (captionEl && translated.caption) captionEl.textContent = translated.caption;
     if (excerptEl && translated.excerpt) excerptEl.textContent = translated.excerpt;
+
+    if (bodyEl && Array.isArray(translated.content) && translated.content.length > 0) {
+      bodyEl.innerHTML = translated.content.map(b => `<p class="article-paragraph">${esc(b.text || '')}</p>`).join('');
+    }
+
     if (barEl) {
       if (a && a.id) barEl.dataset.articleId = a.id;
       barEl.innerHTML = `
@@ -627,10 +889,19 @@
 
   function _restoreOriginal(a) {
     const titleEl   = $('#articleTitle');
+    const captionEl = $('#articleCaption');
     const excerptEl = $('#articleExcerpt');
+    const bodyEl    = $('#articleBody');
     const barEl     = $('#translateBar');
+
     if (titleEl)   titleEl.textContent   = a.title;
+    if (captionEl) captionEl.textContent = a.caption || '';
     if (excerptEl) excerptEl.textContent = a.excerpt || t('noExcerpt');
+
+    if (bodyEl && Array.isArray(a.content) && a.content.length > 0) {
+      bodyEl.innerHTML = a.content.map(b => `<p class="article-paragraph">${esc(b.text || '')}</p>`).join('');
+    }
+
     if (barEl) {
       barEl.dataset.articleId = a.id;
       barEl.innerHTML = `<button type="button" class="btn-translate" id="btnTranslate">${esc(t('translateArticle'))}</button>`;
@@ -662,7 +933,7 @@
         const retryBtn = $('#btnRetry');
         if (retryBtn) retryBtn.addEventListener('click', () => _doTranslate(a, locale, statusEl));
       }
-
+    } finally {
       if (btnT) { btnT.disabled = false; btnT.textContent = t('translateArticle'); }
     }
   }

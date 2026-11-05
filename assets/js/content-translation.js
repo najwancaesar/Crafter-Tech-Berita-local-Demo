@@ -63,7 +63,9 @@
         source:    'zh-CN',
         target:    locale,
         title:     seed.title || '',
-        excerpt:   seed.excerpt || ''
+        excerpt:   seed.excerpt || '',
+        caption:   seed.caption || '',
+        content:   seed.content || null
       };
       _memCache.set(memKey, payload);
       try {
@@ -82,7 +84,9 @@
       source:    'zh-CN',
       target:    locale,
       title:     payload.title || '',
-      excerpt:   payload.excerpt || ''
+      excerpt:   payload.excerpt || '',
+      caption:   payload.caption || '',
+      content:   payload.content || null
     };
     const memKey = `${articleId}_${locale}`;
     _memCache.set(memKey, data);
@@ -137,11 +141,16 @@
         id:           a.id,
         title:        a.title,
         excerpt:      a.excerpt,
+        caption:      a.caption || '',
+        content:      a.content || null,
         category:     a.category,
         date:         a.date,
         sourceUrl:    a.sourceUrl,
         imageKey:     a.imageKey,
         summarySource:a.summarySource,
+        author:       a.author || null,
+        source:       a.source || null,
+        viewCount:    a.viewCount !== undefined ? a.viewCount : null,
         isTranslated: false,
         sourceLocale: 'zh-CN',
         targetLocale: 'zh-CN'
@@ -157,11 +166,16 @@
         id:           a.id,
         title:        cached.title || a.title,
         excerpt:      cached.excerpt || a.excerpt,
+        caption:      cached.caption || a.caption || '',
+        content:      cached.content || a.content || null,
         category:     localizedCat,
         date:         a.date,
         sourceUrl:    a.sourceUrl,
         imageKey:     a.imageKey,
         summarySource:a.summarySource,
+        author:       a.author || null,
+        source:       a.source || null,
+        viewCount:    a.viewCount !== undefined ? a.viewCount : null,
         isTranslated: true,
         sourceLocale: 'zh-CN',
         targetLocale: loc
@@ -173,11 +187,16 @@
       id:           a.id,
       title:        a.title,
       excerpt:      a.excerpt,
+      caption:      a.caption || '',
+      content:      a.content || null,
       category:     localizedCat,
       date:         a.date,
       sourceUrl:    a.sourceUrl,
       imageKey:     a.imageKey,
       summarySource:a.summarySource,
+      author:       a.author || null,
+      source:       a.source || null,
+      viewCount:    a.viewCount !== undefined ? a.viewCount : null,
       isTranslated: false,
       sourceLocale: 'zh-CN',
       targetLocale: loc

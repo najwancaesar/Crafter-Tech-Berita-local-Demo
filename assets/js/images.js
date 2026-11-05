@@ -56,6 +56,7 @@ window.SHANGBAO_IMAGES = window.SHANGBAO_IMAGES || {
   "metropolitan-1792764926": "assets/images/articles/Train.jpg",
 
   // --- 国外新闻 (Foreign News) ---
+  "berita-luar-negeri-1793842820": "assets/images/articles/louvre-exhibition.jpg",
   "berita-luar-negeri-1793020357": "assets/images/articles/England country.jpg",
   "berita-luar-negeri-1793020287": "assets/images/articles/Meet up.jpg",
   "berita-luar-negeri-1793020240": "assets/images/articles/President - moment 2.jpg",
