@@ -24,24 +24,21 @@ The router is implemented in `assets/js/app.js` inside the `hashchange` and `DOM
 
 The article renderer (`renderContentBlocks()` in `app.js`) supports these block types in the article `content` array:
 
-| Block Type | Field Key | Rendered As |
-|---|---|---|
-| `paragraph` | `text` | `<p class="article-paragraph">` |
-| `heading` | `text` | `<h2 class="article-heading">` |
-| `subheading` | `text` | `<h3 class="article-subheading">` |
-| `quote` | `text` | `<blockquote class="article-quote">` |
-| `list` | `items` (array) | `<ul class="article-list">` |
-| `table` | `headers`, `rows` | `<table class="article-table">` |
-| `image` | `src`, `alt`, `caption` | `<figure class="article-inline-figure">` |
+| Block Type | Field Key | Optional Fields | Rendered HTML / Behavior |
+|---|---|---|---|
+| `paragraph` | `text` | — | `<p class="article-paragraph">${esc(block.text || '')}</p>` |
+| `heading` | `text` | — | `<h2 class="article-heading">${esc(block.text || '')}</h2>` |
+| `subheading` | `text` | — | `<h3 class="article-subheading">${esc(block.text || '')}</h3>` |
+| `quote` | `text` | `cite` | `<blockquote class="article-quote"><p>${esc(block.text || '')}</p>${block.cite ? '<cite>— ' + esc(block.cite) + '</cite>' : ''}</blockquote>` |
+| `list` | `items` (array) | — | `<ul class="article-list">${items.map(it => '<li>' + esc(it) + '</li>').join('')}</ul>` |
+| `table` | `rows` (2D array) | `headers` (array) | Responsive table wrapped in `<div class="article-table-wrap table-responsive">`. `<thead>` is omitted if `headers` is missing. |
+| `image` | `src` | `caption`, `alt` | `<figure class="article-inline-figure"><img src="..." alt="..." loading="lazy">${block.caption ? '<figcaption>' + esc(block.caption) + '</figcaption>' : ''}</figure>` |
 
-**Example data structure:**
-```js
-content: [
-  { type: "paragraph", text: "正文第一段..." },
-  { type: "quote", text: "引言内容..." },
-  { type: "list", items: ["要点一", "要点二", "要点三"] },
-]
-```
+### Resilience & Error Handling
+- **Missing Optional Fields:** Checked via safe guards (`block.cite ? ... : ''`, `headers.length ? ... : ''`, `Array.isArray(block.items) ? ... : []`).
+- **Unknown Block Types:** Fallback `default` case returns `<p class="article-paragraph">${esc(block.text)}</p>` if `block.text` exists, or `''` if empty. Never throws exceptions.
+- **Canonical Chinese Integrity:** Original Chinese text in `data.js` is never mutated. Localized versions are created dynamically via `getLocalizedArticle()` in memory.
+- **Translation Mapping:** Mappings use article IDs and maintain 1:1 index alignment with canonical content arrays.
 
 ---
 
@@ -56,8 +53,13 @@ content: [
 ### Full-Content Article
 - **ID:** `berita-luar-negeri-1793842820`
 - **Title:** 法国卢浮宫举办特展纪念摄影术诞生200周年
-- **Source:** 中新社 (China News Service)
-- **Content blocks:** 7 paragraphs
+- **Publication Date:** 2026年 11月 05日 08:40 AM
+- **Source Agency:** 中新社 (China News Service)
+- **View Count:** 105 (aligned to official reference screenshot; the downloaded HTML snapshot recorded 125 as the live counter progressed on server)
+- **Content blocks:** 7 paragraphs (verbatim from official publication)
+- **Featured Image:** `assets/images/articles/louvre-exhibition.jpg` (official photograph)
+- **Caption:** 当地时间11月4日，法国卢浮宫摄影特展拉开帷幕，旨在纪念摄影术诞生200周年，聚焦卢浮宫在摄影史和摄影艺术中的独特地位。中新社
+- **Original Source URL:** `https://shangbaoindonesia.com/read/2026/11/05/berita-luar-negeri-1793842820`
 - **Image:** `assets/images/articles/louvre-exhibition.jpg`
 - **Data source:** Official Shangbao Indonesia article page (authentic, verbatim)
 

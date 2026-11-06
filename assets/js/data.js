@@ -559,7 +559,7 @@ window.SHANGBAO_DATA = {
       "date": "2026年 11月 05日 08:40 AM",
       "author": "中新社",
       "source": "中新社 (China News Service)",
-      "viewCount": 125,
+      "viewCount": 105,
       "caption": "当地时间11月4日，法国卢浮宫摄影特展拉开帷幕，旨在纪念摄影术诞生200周年，聚焦卢浮宫在摄影史和摄影艺术中的独特地位。中新社",
       "excerpt": "【中新社】法国卢浮宫摄影特展当地时间4日拉开帷幕，聚焦卢浮宫在摄影史和摄影艺术中的独特地位。该展览是法国文化部纪念摄影术诞生200周年系列活动的重要组成部分。",
       "sourceUrl": "https://shangbaoindonesia.com/read/2026/11/05/berita-luar-negeri-1793842820",

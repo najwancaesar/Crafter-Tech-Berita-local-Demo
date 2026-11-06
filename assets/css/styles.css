@@ -38,6 +38,10 @@ html {
     overflow-y: scroll;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 body {
     margin: 0;
 

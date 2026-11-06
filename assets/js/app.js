@@ -642,7 +642,7 @@
     `;
 
     // Metadata Bar
-    const hasViewCount = (a.viewCount !== undefined && a.viewCount !== null);
+    const hasViewCount = (a.viewCount !== undefined && a.viewCount !== null && a.viewCount !== '' && !isNaN(Number(a.viewCount)));
     const sourceAgency = a.source || a.author || (a.excerpt && a.excerpt.startsWith('【中新社】') ? '中新社' : '印尼商报');
     const metaBarHtml = `
       <div class="article-meta-bar">
